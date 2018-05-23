@@ -19,10 +19,11 @@ module SimpleApm
       during = finished - started
 
       info = {
+        id: request_id,
         during: finished - started,
         started: started.to_s,
-        db_runtime: payload[:db_runtime],
-        view_runtime: payload[:view_runtime],
+        db_runtime: payload[:db_runtime].to_f/1000,
+        view_runtime: payload[:view_runtime].to_f/1000,
         controller: payload[:controller],
         action: payload[:action],
         host: Socket.gethostname,
