@@ -1,0 +1,6 @@
+<h1><%= @info['name']%></h1>
+<div><%= @info.inspect %></div>
+<% @slow_requests.each do |id, costs| %>
+  <% r = request_info(id)%>
+  <p><%= time_label r['started'] %> --> <%= r['during'].to_f.round(2) %>s</p>
+<% end%>

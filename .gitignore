@@ -1,0 +1,10 @@
+.idea/
+.bundle/
+.ruby-version
+.ruby-gemset
+log/*.log
+pkg/
+test/dummy/db/*.sqlite3
+test/dummy/db/*.sqlite3-journal
+test/dummy/log/*.log
+test/dummy/tmp/

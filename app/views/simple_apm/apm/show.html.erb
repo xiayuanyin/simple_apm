@@ -1,0 +1,25 @@
+<h1><%= "#{@info['controller']}##{@info['action']}.#{@info['format']}"%></h1>
+<pre><%= @info.inspect %></pre>
+<table class="table table-bordered">
+  <tr>
+    <td>time</td>
+    <td>sql</td>
+    <td>参数</td>
+    <td>时间</td>
+    <td>位置</td>
+  </tr>
+  <% @sqls.each do |sql| %>
+    <tr>
+      <td><%= time_label sql['started'] %></td>
+      <td>
+        <sql>
+          <%= sql['sql'] %>
+        </sql>
+      </td>
+      <td><%= sql['value']%></td>
+      <td><%= sql['during'].to_f.round(3) %>s</td>
+      <td><%= sql['filename'] %>:<%= sql['line'] %></td>
+    </tr>
+  <% end %>
+
+</table>
