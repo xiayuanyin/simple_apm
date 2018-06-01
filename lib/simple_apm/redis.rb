@@ -6,7 +6,7 @@ module SimpleApm
     class << self
       def instance
         @current ||= ::Redis::Namespace.new(
-          :simple_apm,
+          "simple_apm:#{SimpleApm::Setting::APP_NAME}",
           :redis => ::Redis.new(
             url: SimpleApm::Setting::REDIS_URL,
             driver: SimpleApm::Setting::REDIS_DRIVER
@@ -20,6 +20,8 @@ module SimpleApm
         redis.info.each do |k, v|
           if k == 'total_system_memory_human'
             h['系统内存'] = v
+          elsif k == 'used_memory_human'
+            h['当前内存占用'] = v
           elsif k == 'used_memory_rss_human'
             h['当前内存占用(rss)'] = v
           elsif k == 'used_memory_peak_human'

@@ -8,5 +8,7 @@ module SimpleApm
     SLOW_ACTIONS_LIMIT = ApmSettings['slow_actions_limit'].presence || 1000
     # 每个action存最慢的请求量
     ACTION_SLOW_REQUEST_LIMIT = ApmSettings['action_slow_request_limit'].presence || 100
+    # 区分项目显示
+    APP_NAME = ApmSettings['app_name'].presence || 'app'
   end
 end
