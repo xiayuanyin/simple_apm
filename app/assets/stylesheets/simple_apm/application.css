@@ -13,3 +13,34 @@
  *= require_tree .
  *= require_self
  */
+footer{
+  text-align: center;
+  padding: 10px;
+  border-top: 1px solid #999999;
+}
+a.navbar-brand.active{
+  color: #00AEEF !important;
+}
+#page-container{
+  min-height: 80vh;
+}
+.select-apm-date{
+  width: auto;
+  float: right;
+  margin-top: 8px;
+}
+.select-apm-date>select{
+  display: inline-block;
+  width: auto;
+}
+.sql{
+  max-width: 300px;
+  white-space: nowrap;
+  text-overflow:ellipsis;
+  overflow: hidden;
+  color: #00AEEF;
+  cursor: pointer;
+}
+pre {
+  white-space: pre-wrap;
+}

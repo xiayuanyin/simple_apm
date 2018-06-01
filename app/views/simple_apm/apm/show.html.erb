@@ -1,25 +1,61 @@
-<h1><%= "#{@info['controller']}##{@info['action']}.#{@info['format']}"%></h1>
-<pre><%= @info.inspect %></pre>
-<table class="table table-bordered">
+<h4><%= @request.action_name %>.<%= @request.format %></h4>
+<!--  @host="xyy", @remote_addr="127.0.0.1", @method="GET", @format="html", @exception="null"-->
+<p>
+  <label>开始时间：</label>
+  <span><%= time_label @request.started, true %></span>
+</p>
+<p>
+  <label>响应时间：</label>
+  <span>
+  <%= sec_str @request.during %>
+    （数据库：<%= sec_str @request.db_runtime %>, View: <%= sec_str @request.view_runtime %>）
+</span>
+</p>
+<p>
+  <label>server：</label>
+  <span><%= @request.host %></span>
+</p>
+<p>
+  <label>访问ip：</label>
+  <span><%= @request.remote_addr %></span>
+</p>
+<% if @request.exception.present? && @request.exception != 'null' %>
+  <p>
+    <label>报错信息: </label>
+    <pre><%= @request.exception %></pre>
+  </p>
+<% end %>
+<table id="sql-table" class="table">
+  <thead>
   <tr>
     <td>time</td>
+    <td>name</td>
     <td>sql</td>
-    <td>参数</td>
     <td>时间</td>
     <td>位置</td>
   </tr>
-  <% @sqls.each do |sql| %>
+  </thead>
+  <tbody>
+  <% @request.sqls.each do |sql| %>
     <tr>
-      <td><%= time_label sql['started'] %></td>
+      <td><%= time_label sql.started %></td>
       <td>
-        <sql>
-          <%= sql['sql'] %>
-        </sql>
+          <%= sql.name %>
       </td>
-      <td><%= sql['value']%></td>
-      <td><%= sql['during'].to_f.round(3) %>s</td>
-      <td><%= sql['filename'] %>:<%= sql['line'] %></td>
+      <td>
+        <div class="sql"><%= sql.full_sql -%></div>
+      </td>
+      <td><%= sec_str sql.during %></td>
+      <td><%= sql.filename %>:<%= sql.line %></td>
     </tr>
   <% end %>
-
+  </tbody>
 </table>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#sql-table').DataTable({
+      bPaginate: false
+    })
+
+  })
+</script>

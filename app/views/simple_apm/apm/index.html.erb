@@ -1,5 +1,5 @@
-<h1>慢事务追踪<%= @apm_date.strftime('%Y-%m-%d') %></h1>
-<table class="table table-bordered">
+<table id="slow-requests" class="table">
+  <thead>
   <tr>
     <th>请求时间</th>
     <th>action</th>
@@ -9,20 +9,30 @@
     <th>host</th>
     <th>remote_addr</th>
   </tr>
-  <% @slow_requests.each do |id| %>
-    <tr>
-      <% h = request_info(id) %>
-      <td>
-        <%= link_to time_label(h['started']), show_path(id: id)%>
-      </td>
-      <td><%= link_to "#{h['controller']}##{h['action']}.#{h['format']}", action_info_path(action_name: "#{h['controller']}##{h['action']}")%></td>
-      <td><%= h['during'].to_f.round(2)%>s</td>
-      <td><%= h['db_runtime'].to_i%>ms</td>
-      <td><%= h['view_runtime'].to_i%>ms</td>
-      <td><%= h['host']%></td>
-      <td><%= h['remote_addr']%></td>
-    </tr>
-
-  <% end %>
+  </thead>
+  <%# @slow_requests.each do |r| %>
+<!--    <tr>-->
+      <%# request = r.request %>
+<!--      <td>-->
+        <%#= link_to time_label(request.started), show_path(id: request.request_id)%>
+<!--      </td>-->
+<!--      <td><%#= link_to request.action_name, action_info_path(action_name: request.action_name)%></td>-->
+<!--      <td><%#= sec_str request.during %></td>-->
+<!--      <td><%#= sec_str request.db_runtime %></td>-->
+<!--      <td><%#= sec_str request.view_runtime%></td>-->
+<!--      <td><%#= request.host %></td>-->
+<!--      <td><%#= request.remote_addr %></td>-->
+<!--    </tr>-->
+  <%# end %>
 </table>
 
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#slow-requests').DataTable({
+      ajax: '<%= index_path %>.json',
+      iDisplayLength: 25,
+      ordering: false
+    })
+
+  })
+</script>

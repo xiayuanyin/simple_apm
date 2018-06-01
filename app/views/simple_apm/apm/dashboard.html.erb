@@ -1,0 +1,35 @@
+<div id="time_chart" style="height: 400px;width: auto"></div>
+<div id="hits_chart" style="height: 400px;width: auto"></div>
+<script>
+  var time_chart = echarts.init(document.getElementById('time_chart')),
+      hits_chart = echarts.init(document.getElementById('hits_chart'));
+  time_chart.setOption({
+    title: {
+      text: '响应时间'
+    },
+    tooltip: {},
+    xAxis: {
+      data: <%= @x_names.to_json.html_safe %>
+    },
+    yAxis: {type: 'value'},
+    series: [{
+        type: 'line',
+        data: <%= @time_arr.to_json.html_safe %>
+      }]
+  })
+
+  hits_chart.setOption({
+    title: {
+      text: '访问次数'
+    },
+    tooltip: {},
+    xAxis: {
+      data: <%= @x_names.to_json.html_safe %>
+    },
+    yAxis: {type: 'value'},
+    series: [{
+      type: 'line',
+      data: <%= @hits_arr.to_json.html_safe %>
+    }]
+  })
+</script>

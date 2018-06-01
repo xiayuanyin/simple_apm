@@ -1,28 +1,30 @@
 # 单个请求信息
 module SimpleApm
   class Request
-    attr_accessor :id,
+    attr_accessor :request_id, :action_name,
                   :during, :started, :db_runtime, :view_runtime,
                   :controller, :action, :format, :method,
                   :host, :remote_addr,
-                  :exception
+                  :exception, :status
     def initialize(h)
       h.each do |k, v|
-        send("#{k}=", v)
+        send("#{k}=", v) rescue puts "attr #{k} not set!"
       end
     end
 
     def sqls
-      @sqls ||= SimpleApm::Sql.all(id)
+      @sqls ||= SimpleApm::Sql.find_by_request_id(request_id)
     end
 
-    def find(id)
-      SimpleApm::Request.new JSON.parse(SimpleApm::Redis.hget(SimpleApm::Request.key, id))
-    end
 
     class << self
+
+      def find(id)
+        SimpleApm::Request.new JSON.parse(SimpleApm::Redis.hget(key, id))
+      end
+
       def create(h)
-        SimpleApm::Redis.hmset key, h['id'], h.to_json
+        SimpleApm::Redis.hmset key, h['request_id'], h.to_json
       end
 
       def key

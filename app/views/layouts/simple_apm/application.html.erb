@@ -5,17 +5,57 @@
   <meta charset="utf-8">
   <meta content="IE=Edge,chrome=1" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <%= stylesheet_link_tag    "simple_apm/application", media: "all" %>
+  <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+  <script src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="//cdn.bootcss.com/echarts/4.1.0/echarts.js"></script>
+  <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <%= stylesheet_link_tag "simple_apm/application", media: "all" %>
   <%= javascript_include_tag "simple_apm/application" %>
   <%= csrf_meta_tags %>
-
 </head>
 <body>
+<div id="page-container">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <% [[dashboard_path, 'Dashboard'], [index_path, '慢事务列表'], [actions_path, 'ActionList']].each do |m| %>
+          <a class="navbar-brand <%= 'active' if request.url=~/#{m[0]}/ %>" href="<%= m[0] %>" ><%= m[1] %></a>
+        <% end %>
+      </div>
+      <div class="select-apm-date">
+        统计日期
+        <%= select_tag 'apm_date', options_for_select(SimpleApm::Redis.in_apm_days, apm_date), class: 'form-control'%>
+      </div>
 
-<%= yield %>
+    </div>
+  </nav>
+  <div class="container" style="margin-top: 55px">
+    <%= yield %>
+  </div>
+</div>
+<footer style="text-align: center">
+  <% SimpleApm::Redis.simple_info.each do |k, v| %>
+    <label><%= k %>：</label><span><%= v %></span>
+  <% end %>
+</footer>
+<div id="sql-modal" class="modal" aria-hidden="true" role="dialog" style="display: none;" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-popout">
+    <pre class="modal-content" data-lang="SQL">
+    </pre>
+  </div>
+</div>
 
 </body>
+<script>
+  var sql_modal_obj = $('#sql-modal')
+  $('.select-apm-date select').on('change',function(){
+      window.location.href = '<%= set_apm_date_path %>?apm_date='+this.value
+  })
+  $('.sql').on('click', function(){
+      sql_modal_obj.find('.modal-content').html($(this).html())
+      sql_modal_obj.modal('show')
+  })
+</script>
 </html>

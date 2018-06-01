@@ -1,6 +1,41 @@
-<h1><%= @info['name']%></h1>
-<div><%= @info.inspect %></div>
-<% @slow_requests.each do |id, costs| %>
-  <% r = request_info(id)%>
-  <p><%= time_label r['started'] %> --> <%= r['during'].to_f.round(2) %>s</p>
-<% end%>
+<h4>请求概况</h4>
+<h5><%= @action.name%></h5>
+<p>
+  <label>当日点击次数：</label>
+  <span><%= @action.click_count %></span>
+</p>
+<p>
+  <label>平均响应时间：</label>
+  <span><%= sec_str @action.time.to_f/@action.click_count.to_i %></span>
+</p>
+<p>
+  <label>最慢响应时间：</label>
+  <span><%= link_to sec_str(@action.slow_time), show_path(id: @action.slow_id) %></span>
+</p>
+<p>
+  <label>最快响应时间：</label>
+  <span><%= link_to sec_str(@action.fast_time), show_path(id: @action.fast_id) %></span>
+</p>
+<table class="table table-bordered">
+  <tr>
+    <th>响应时间</th>
+    <th>访问时间</th>
+    <th>请求id</th>
+    <th>访问ip</th>
+    <th>server</th>
+  </tr>
+  <% @action.slow_requests.each do |slow_request| %>
+    <% r = slow_request.request %>
+    <tr>
+      <td>
+        <%= sec_str r.during %>
+        (DB: <%= sec_str r.db_runtime %> , View: <%= sec_str r.view_runtime %>)
+      </td>
+      <td><%= time_label r.started %></td>
+      <td><%= link_to r.request_id, show_path(id: r.request_id) %></td>
+      <td><%= r.remote_addr %></td>
+      <td><%= r.host %></td>
+    </tr>
+  <% end %>
+</table>
+
