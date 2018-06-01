@@ -1,5 +1,6 @@
 # 删除 所有
 # redis-cli keys "simple_apm:*" | xargs redis-cli del
+require 'redis-namespace'
 module SimpleApm
   class Redis
     class << self
