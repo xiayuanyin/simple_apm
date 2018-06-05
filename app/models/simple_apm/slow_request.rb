@@ -40,7 +40,7 @@ module SimpleApm
       # @param during [Float] 耗时
       # @return [Boolean] 是否插入成功
       def update_request(during, request_id)
-        # 记录最慢请求列表1000个
+        # 记录最慢请求列表5000个
         SimpleApm::Redis.zadd(key, during, request_id)
         SimpleApm::Redis.zremrangebyrank(key, 0, -SimpleApm::Setting::SLOW_ACTIONS_LIMIT - 1)
         SimpleApm::Redis.zrank(key, request_id).present?
@@ -50,7 +50,7 @@ module SimpleApm
       # @return [Array<SimpleApm::SlowRequest>]
       def list_by_action(action_name, limit = 100, offset = 0)
         SimpleApm::Redis.zrevrange(
-          action_key(action_name), offset, limit, with_scores: true
+          action_key(action_name), offset, limit.to_i - 1, with_scores: true
         ).map{ |x| SimpleApm::SlowRequest.new(x[0], x[1], action_name)}
       end
 

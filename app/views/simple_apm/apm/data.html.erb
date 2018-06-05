@@ -1,0 +1,27 @@
+<p class="pull-right">
+  <span class="text-danger">删除数据：</span>
+  <%= link_to '保留进一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm': '确定删除所有一周以前的数据？'%>
+  <%= link_to '保留进一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm': '确定删除所有一个月以前的数据？' %>
+</p>
+
+<table class="table table-bordered">
+  <thead>
+  <tr>
+    <th>日期</th>
+    <th>请求数量</th>
+    <th>平均响应时间</th>
+    <th>操作</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!--  {day: date_str, hits: hits, time: time, avg_time: avg_time}-->
+  <% @data.each do |d| %>
+    <tr>
+      <td><%= d[:day]%></td>
+      <td><%= d[:hits]%></td>
+      <td><%= sec_str d[:avg_time]%></td>
+      <td><%= link_to '删除', data_delete_path(date: d[:day]), 'data-confirm': '确定删除？' %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

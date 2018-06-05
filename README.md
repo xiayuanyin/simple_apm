@@ -3,18 +3,21 @@
 基于Redis的简单的Web请求性能监控/慢事务追踪工具
 
 以天为维度记录：
-- 最慢的1000个(默认1000)请求
-- 记录每个action最慢的100次请求
+- 最慢的500个(默认500)请求
+- 记录每个action最慢的20次请求
 - 记录每个action的平均访问时间
-- 记录每个小时请求量
 - 记录慢请求的详情和对应SQL详情（多余的会删掉）
-- 以10分钟为刻度记录平均/最慢访问时间、次数等性能指标
+- 以10分钟为刻度记录平均/最慢访问时间、次数等性能指标，并生成图表
 
 ## Usage
 
 ```ruby
 # routes.rb
-mount SimpleApm::Engine => '/apm'
+mount SimpleApm::Engine => "/apm"
+
+# 或运行 
+rails generate simple_apm:install 
+
 ```
 
 

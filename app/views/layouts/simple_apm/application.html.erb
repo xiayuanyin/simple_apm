@@ -20,13 +20,23 @@
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <% [[dashboard_path, 'Dashboard'], [index_path, '慢事务列表'], [actions_path, 'ActionList']].each do |m| %>
-          <a class="navbar-brand <%= 'active' if request.url=~/#{m[0]}/ %>" href="<%= m[0] %>" ><%= m[1] %></a>
+        <%
+          [
+            [dashboard_path, 'Dashboard'],
+            [index_path, '慢事务列表'],
+            [actions_path, 'ActionList'],
+            [data_path, '数据管理']
+          ].each do |m|
+        %>
+          <a class="navbar-brand <%= 'active' if request.url =~ /#{m[0]}/ %>"
+             href="<%= m[0] %>" >
+            <%= m[1] %>
+          </a>
         <% end %>
       </div>
       <div class="select-apm-date">
         统计日期
-        <%= select_tag 'apm_date', options_for_select(SimpleApm::Redis.in_apm_days, apm_date), class: 'form-control'%>
+        <%= select_tag 'apm_date', options_for_select(SimpleApm::Redis.in_apm_days, apm_date), class: 'form-control' %>
       </div>
 
     </div>
@@ -42,20 +52,35 @@
 </footer>
 <div id="sql-modal" class="modal" aria-hidden="true" role="dialog" style="display: none;" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-popout">
-    <pre class="modal-content" data-lang="SQL">
-    </pre>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">SQL</div>
+      </div>
+      <div class="panel-body">
+        <pre class="modal-content" data-lang="SQL"></pre>
+      </div>
+    </div>
+
   </div>
 </div>
 
 </body>
 <script>
-  var sql_modal_obj = $('#sql-modal')
-  $('.select-apm-date select').on('change',function(){
-      window.location.href = '<%= set_apm_date_path %>?apm_date='+this.value
-  })
-  $('.sql').on('click', function(){
-      sql_modal_obj.find('.modal-content').html($(this).html())
-      sql_modal_obj.modal('show')
-  })
+    <% if flash[:notice].present? %>
+      alert(<%= flash[:notice].to_json.html_safe %>)
+    <% end %>
+    var sql_modal_obj = $('#sql-modal')
+    $('.select-apm-date select').on('change', function () {
+        window.location.href = '<%= set_apm_date_path %>?apm_date=' + this.value
+    })
+    $('.sql').on('click', function () {
+        sql_modal_obj.find('.modal-content').html($(this).html())
+        sql_modal_obj.modal('show')
+    })
+    // 手写部分ujs
+    $("a[data-confirm]").on('click', function () {
+        return confirm($(this).data('confirm'))
+    })
+
 </script>
 </html>

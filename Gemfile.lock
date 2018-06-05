@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple_apm (0.1.8)
+    simple_apm (0.1.9)
       callsite (~> 0.0)
       rails (~> 5.0)
       redis-namespace (~> 1.5)

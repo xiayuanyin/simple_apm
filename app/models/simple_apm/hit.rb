@@ -4,6 +4,19 @@ module SimpleApm
 
 
     class << self
+      def day_info(date_str)
+        hits, time = 0, 0.0
+        SimpleApm::Redis.hgetall(minute_key(date_str)).each do |k, v|
+          if k=~/time/
+            time += v.to_f
+          elsif k=~/hits/
+            hits += v.to_i
+          end
+        end
+        avg_time = (hits.to_i==0 ? 0 : (time/hits).to_f.round(3))
+        {day: date_str, hits: hits, time: time, avg_time: avg_time}
+      end
+
       def chart_data(start_time = '00:00', end_time = '23:50', per = 'minute')
         start_hour = start_time.to_s.split(':').first.to_i
         end_hour = [end_time.to_s.split(':').first.to_i, 23].min
@@ -42,8 +55,8 @@ module SimpleApm
         i.to_s.size==1 ? "0#{i}" : i.to_s
       end
 
-      def minute_key
-        SimpleApm::RedisKey['per-10-minute']
+      def minute_key(date_str = nil)
+        SimpleApm::RedisKey['per-10-minute', date_str]
       end
 
       # def hour_hit_key

@@ -13,9 +13,9 @@
     <tr>
       <td><%= link_to action.name, action_info_path(action_name: action.name) %></td>
       <td><%= action.click_count %></td>
-      <td><%= sec_str action.avg_time, 's' %></td>
-      <td><%= link_to sec_str(action.fast_time, 's'), show_path(id: action.fast_id) %></td>
-      <td><%= link_to sec_str(action.slow_time, 's'), show_path(id: action.slow_id) %></td>
+      <td><%= sec_str action.avg_time %></td>
+      <td><%= link_to sec_str(action.fast_time), show_path(id: action.fast_id) %></td>
+      <td><%= link_to sec_str(action.slow_time), show_path(id: action.slow_id) %></td>
     </tr>
   <% end %>
   </tbody>
@@ -23,7 +23,9 @@
 <script type="text/javascript">
   $(document).ready(function(){
       $('#actions-table').DataTable({
-          iDisplayLength: 25
+          iDisplayLength: 25,
+          // 自定义的排序方法
+          aoColumnDefs: [ {sType: "sec", aTargets: [2,3,4]}]
       })
 
   })

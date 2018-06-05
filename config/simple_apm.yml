@@ -1,0 +1,11 @@
+# 默认为 redis://localhost:6379/0
+# 确保是完整的redis地址，可以设置远程地址
+redis_url:
+# 默认为空, 建议使用hiredis(并确保有这个gem)
+redis_driver:
+# 记录每天的最慢的请求数存储量，默认500
+slow_actions_limit:
+# 记录每天的每个Action最慢的N个请求，默认20
+action_slow_request_limit:
+# 项目名，默认为 'app'，区分项目名可以多个项目数据存于一台redis server上
+app_name:

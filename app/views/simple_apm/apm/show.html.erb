@@ -1,5 +1,4 @@
-<h4><%= @request.action_name %>.<%= @request.format %></h4>
-<!--  @host="xyy", @remote_addr="127.0.0.1", @method="GET", @format="html", @exception="null"-->
+<h4><%= @request.action_name %>.<%= @request.format %>(<%= @request.method %>)</h4>
 <p>
   <label>开始时间：</label>
   <span><%= time_label @request.started, true %></span>
@@ -31,7 +30,7 @@
     <td>time</td>
     <td>name</td>
     <td>sql</td>
-    <td>时间</td>
+    <td>时间(ms)</td>
     <td>位置</td>
   </tr>
   </thead>
@@ -54,7 +53,9 @@
 <script type="text/javascript">
   $(document).ready(function(){
     $('#sql-table').DataTable({
-      bPaginate: false
+      bPaginate: false,
+      // 自定义的排序方法
+      aoColumnDefs: [{sType: "sec", aTargets: [3]}]
     })
 
   })

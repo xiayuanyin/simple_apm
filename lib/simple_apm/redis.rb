@@ -37,7 +37,22 @@ module SimpleApm
 
       # 所有统计的日期，通过hits来判断
       def in_apm_days
-        SimpleApm::Redis.keys('*:action-names').map{|x|x.split(':').first}.sort
+        SimpleApm::Redis.keys('*:action-names').map{|x|x.split(':').first}.sort.reverse
+      end
+
+      # 清理指定日期之前的数据
+      def clear_data_before_time(date)
+        i = 0
+        SimpleApm::Redis.in_apm_days.each do |d|
+          SimpleApm::Redis.clear_data(d) and i+=1 if Time.parse(d) <= date
+        end
+        i
+      end
+
+      def clear_data(date_str)
+        return {success: false, msg: '当日没有数据'} unless in_apm_days.include?(date_str)
+        keys = SimpleApm::Redis.keys("#{date_str}:*")
+        {success: true, msg: SimpleApm::Redis.del(keys)}
       end
 
       def method_missing(method, *args)
