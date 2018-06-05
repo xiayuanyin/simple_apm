@@ -22,7 +22,7 @@ module SimpleApm
               controller: payload[:controller],
               action: payload[:action],
               host: Socket.gethostname,
-              remote_addr: payload[:headers]['HTTP_X_REAL_IP'],
+              remote_addr: (payload[:headers]['HTTP_X_REAL_IP'] rescue nil),
               method: payload[:method],
               format: payload[:format],
               exception: payload[:exception].presence.to_json
@@ -40,7 +40,7 @@ module SimpleApm
         end
       end
     rescue => e
-      Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace
+      Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace.join("\n")
     end
   end
 
@@ -54,7 +54,7 @@ module SimpleApm
           payload.merge!(:line => c.line, :filename => c.filename.to_s.gsub(Rails.root.to_s, ''), :method => c.method)
         end
         # ActiveRecord::Relation::QueryAttribute
-        sql_value = payload[:binds].map {|q| [q.name, q.value]}
+        sql_value = payload[:binds].map {|q| [q.name, q.value]} rescue nil
         info = {
             request_id: request_id,
             name: payload[:name],
@@ -68,7 +68,7 @@ module SimpleApm
         SimpleApm::Sql.create request_id, info
       end
     rescue => e
-      Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace
+      Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace.join("\n")
     end
   end
 end

@@ -1,7 +1,7 @@
 <p class="pull-right">
   <span class="text-danger">删除数据：</span>
-  <%= link_to '保留进一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm': '确定删除所有一周以前的数据？'%>
-  <%= link_to '保留进一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm': '确定删除所有一个月以前的数据？' %>
+  <%= link_to '保留进一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm'=> '确定删除所有一周以前的数据？'%>
+  <%= link_to '保留进一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm'=> '确定删除所有一个月以前的数据？' %>
 </p>
 
 <table class="table table-bordered">
@@ -20,7 +20,7 @@
       <td><%= d[:day]%></td>
       <td><%= d[:hits]%></td>
       <td><%= sec_str d[:avg_time]%></td>
-      <td><%= link_to '删除', data_delete_path(date: d[:day]), 'data-confirm': '确定删除？' %></td>
+      <td><%= link_to '删除', data_delete_path(date: d[:day]), 'data-confirm'=> '确定删除？' %></td>
     </tr>
   <% end %>
   </tbody>

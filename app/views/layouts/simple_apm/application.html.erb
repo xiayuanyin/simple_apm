@@ -11,8 +11,72 @@
   <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="//cdn.bootcss.com/echarts/4.1.0/echarts.js"></script>
   <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-  <%= stylesheet_link_tag "simple_apm/application", media: "all" %>
-  <%= javascript_include_tag "simple_apm/application" %>
+  <style>
+    footer {
+      text-align: center;
+      padding: 10px;
+      border-top: 1px solid #999999;
+    }
+
+    a.navbar-brand.active {
+      color: #00AEEF !important;
+    }
+
+    #page-container {
+      min-height: 80vh;
+    }
+
+    .select-apm-date {
+      width: auto;
+      float: right;
+      margin-top: 8px;
+    }
+
+    .select-apm-date > select {
+      display: inline-block;
+      width: auto;
+    }
+
+    .sql {
+      max-width: 300px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      color: #00AEEF;
+      cursor: pointer;
+    }
+
+    pre {
+      white-space: pre-wrap;
+    }
+  </style>
+  <script type="text/javascript">
+      // JqueryDataTable自定义排序方法
+      jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+          "sec-pre": function (a) {
+              var x = String(a).replace(/<[\s\S]*?>/g, "");    //去除html标记
+              x = x.replace(/&amp;nbsp;/ig, "");                   //去除空格
+              x = x.replace(/%/, "");                          //去除百分号
+              if (x.indexOf('ms') > 0) {
+                  x = x.replace(/ms/, "");
+                  return parseFloat(x) / 1000;
+              } else if (x.indexOf('min') > 0) {
+                  x = x.replace(/min/, "");
+                  return parseFloat(x) * 60;
+              } else {
+                  x = x.replace(/min/, "");
+                  return parseFloat(x)
+              }
+          },
+          "sec-asc": function (a, b) {                //正序排序引用方法
+              return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+          },
+          "sec-desc": function (a, b) {                //倒序排序引用方法
+              return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+          }
+      });
+  </script>
+
   <%= csrf_meta_tags %>
 </head>
 <body>
