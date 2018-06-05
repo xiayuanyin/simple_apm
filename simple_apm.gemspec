@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "simple_apm"
   s.version     = SimpleApm::VERSION
   s.authors     = ["yuanyin.xia"]
-  s.email       = ["454536909@qq.com"]
+  s.email       = ["xiayuanyin@qq.com"]
   s.homepage    = "https://github.com/xiayuanyin/simple_apm"
   s.summary     = "xyy: Simple Rails Apm"
   s.description = "xyy: Simple Apm View for rails using redis."
