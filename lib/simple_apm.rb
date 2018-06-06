@@ -7,6 +7,7 @@ module SimpleApm
     begin
       request_id = Thread.current['action_dispatch.request_id']
       need_skip = payload[:controller] == 'SimpleApm::ApmController'
+      need_skip = true if payload[:status].to_s=='302' && payload[:path].to_s=~/login/ && payload[:method].to_s.downcase=='get'
       if request_id.present?
         if need_skip
           SimpleApm::Sql.delete_by_request_id(request_id)
