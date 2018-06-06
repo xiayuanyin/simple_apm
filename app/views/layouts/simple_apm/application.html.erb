@@ -113,6 +113,13 @@
   <% SimpleApm::Redis.simple_info.each do |k, v| %>
     <label><%= k %>：</label><span><%= v %></span>
   <% end %>
+  <p>
+    <% if SimpleApm::Redis.running? %>
+      <span style="color: greenyellow">数据收集中……</span>
+    <% else %>
+      <span style="color: red">已暂停</span>
+    <% end %>
+  </p>
 </footer>
 <div id="sql-modal" class="modal" aria-hidden="true" role="dialog" style="display: none;" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-popout">

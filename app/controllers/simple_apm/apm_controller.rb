@@ -65,6 +65,12 @@ module SimpleApm
       elsif params[:type]=='week'
         del_count = SimpleApm::Redis.clear_data_before_time(Time.now.at_beginning_of_day - 1.week)
         flash[:notice] = "成功删除#{del_count}条数据"
+      elsif params[:type]=='stop_data'
+        SimpleApm::Redis.stop!
+        flash[:notice] = '设置成功！'
+      elsif params[:type]=='rerun_data'
+        SimpleApm::Redis.rerun!
+        flash[:notice] = '设置成功！'
       else
         flash[:notice] = '未知操作！'
         # r = params[:date].map{|d|SimpleApm::Redis.clear_data(d)}

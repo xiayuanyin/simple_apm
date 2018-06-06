@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    simple_apm (1.0.0)
-      callsite (~> 0.0)
+    simple_apm (1.0.1)
+      callsite
       rails (>= 4.2)
-      redis-namespace (~> 1.5)
+      redis-namespace (>= 1.5)
 
 GEM
   remote: https://rubygems.org/

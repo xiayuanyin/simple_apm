@@ -55,6 +55,19 @@ module SimpleApm
         {success: true, msg: SimpleApm::Redis.del(keys)}
       end
 
+      def running?
+        hget('status','running').to_s != 'false'
+      end
+      
+      def rerun!
+        hset('status', 'running', true)
+      end
+
+      # 停止收集数据
+      def stop!
+        hset('status', 'running', false)
+      end
+
       def method_missing(method, *args)
         instance.send(method, *args)
       rescue NoMethodError

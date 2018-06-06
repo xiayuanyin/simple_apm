@@ -5,7 +5,9 @@ module SimpleApm
     end
 
     def call(env)
-      Thread.current['action_dispatch.request_id'] = env['action_dispatch.request_id']
+      if SimpleApm::Redis.running?
+        Thread.current['action_dispatch.request_id'] = env['action_dispatch.request_id']
+      end
       @app.call(env)
     end
   end
