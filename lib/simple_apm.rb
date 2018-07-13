@@ -3,8 +3,11 @@ require "simple_apm/redis"
 require "simple_apm/engine"
 require 'callsite'
 module SimpleApm
+  # RUBY_PLATFORM darwin linux win32
+  # ps aux | grep -w 30057 | awk '$2==30057 {print $6}'
   ActiveSupport::Notifications.subscribe('process_action.action_controller') do |name, started, finished, unique_id, payload|
     begin
+      SimpleApm::RedisKey.query_date = nil
       request_id = Thread.current['action_dispatch.request_id']
       need_skip = payload[:controller] == 'SimpleApm::ApmController'
       need_skip = true if payload[:status].to_s=='302' && payload[:path].to_s=~/login/ && payload[:method].to_s.downcase=='get'
@@ -16,6 +19,7 @@ module SimpleApm
           info = {
               request_id: request_id,
               action_name: action_name,
+              url: payload[:path],
               during: finished - started,
               started: started.to_s,
               db_runtime: payload[:db_runtime].to_f / 1000,
@@ -47,8 +51,10 @@ module SimpleApm
 
   ActiveSupport::Notifications.subscribe 'sql.active_record' do |name, started, finished, unique_id, payload|
     begin
+      SimpleApm::RedisKey.query_date = nil
       request_id = Thread.current['action_dispatch.request_id'].presence || Thread.main['action_dispatch.request_id']
-      if request_id.present?
+      during = finished - started
+      if request_id.present? || during < SimpleApm::Setting::SQL_CRITICAL_TIME
         dev_caller = caller.detect {|c| c.include? Rails.root.to_s}
         if dev_caller
           c = ::Callsite.parse(dev_caller)
@@ -59,7 +65,7 @@ module SimpleApm
         info = {
             request_id: request_id,
             name: payload[:name],
-            during: finished - started,
+            during: during,
             started: started,
             sql: payload[:sql],
             value: sql_value,

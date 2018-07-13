@@ -4,7 +4,7 @@ module SimpleApm
     attr_accessor :request_id, :action_name,
                   :during, :started, :db_runtime, :view_runtime,
                   :controller, :action, :format, :method,
-                  :host, :remote_addr,
+                  :host, :remote_addr, :url,
                   :exception, :status
     def initialize(h)
       h.each do |k, v|

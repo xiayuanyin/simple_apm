@@ -10,5 +10,7 @@ module SimpleApm
     ACTION_SLOW_REQUEST_LIMIT = ApmSettings['action_slow_request_limit'].presence || 20
     # 区分项目显示
     APP_NAME = ApmSettings['app_name'].presence || 'app'
+    # SQL临界值
+    SQL_CRITICAL_TIME = ApmSettings['sql_critical_time'].to_f
   end
 end

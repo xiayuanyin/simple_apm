@@ -7,5 +7,5 @@ SimpleApm::Engine.routes.draw do
   get 'data', to: 'apm#data'
   get 'data_delete', to: 'apm#data_delete'
   get 'set_apm_date', to: 'apm#set_apm_date'
-
+  root 'apm#dashboard'
 end

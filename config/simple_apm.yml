@@ -9,3 +9,5 @@ slow_actions_limit:
 action_slow_request_limit:
 # 项目名，默认为 'app'，区分项目名可以多个项目数据存于一台redis server上
 app_name:
+# 记录SQL的最低时间（单位：秒），小于指定数值的则不记录
+sql_critical_time:

@@ -57,8 +57,10 @@ module SimpleApm
 
       def running?
         hget('status','running').to_s != 'false'
+      rescue
+        false
       end
-      
+
       def rerun!
         hset('status', 'running', true)
       end

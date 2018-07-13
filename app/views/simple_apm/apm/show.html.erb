@@ -1,5 +1,9 @@
 <h4><%= @request.action_name %>.<%= @request.format %>(<%= @request.method %>)</h4>
 <p>
+  <label>URL：</label>
+  <span><%= @request.url %></span>
+</p>
+<p>
   <label>开始时间：</label>
   <span><%= time_label @request.started, true %></span>
 </p>
