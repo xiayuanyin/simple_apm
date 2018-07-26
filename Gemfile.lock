@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    simple_apm (1.0.2)
-      callsite
+    simple_apm (1.0.4)
+      callsite (>= 0.0.1)
+      get_process_mem (~> 0)
       rails (>= 4.2)
       redis-namespace (>= 1.5)
 
@@ -56,6 +57,7 @@ GEM
     concurrent-ruby (1.0.5)
     crass (1.0.4)
     erubi (1.7.1)
+    get_process_mem (0.2.2)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     i18n (1.0.1)

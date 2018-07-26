@@ -11,3 +11,6 @@ action_slow_request_limit:
 app_name:
 # 记录SQL的最低时间（单位：秒），小于指定数值的则不记录
 sql_critical_time:
+# 不统计的请求(值为：xxxController#Action)（数组）
+#  - Devise::SessionsController#create
+exclude_actions:

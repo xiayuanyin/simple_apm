@@ -15,6 +15,13 @@
 </span>
 </p>
 <p>
+  <label>结束时内存：</label>
+  <span>
+  <%= @request.completed_memory.to_f.round(1) %>M
+    （增幅：<%= @request.memory_during.to_f.round(1) %>M）
+</span>
+</p>
+<p>
   <label>server：</label>
   <span><%= @request.host %></span>
 </p>

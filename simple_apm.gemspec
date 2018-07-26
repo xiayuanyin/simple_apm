@@ -18,5 +18,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails', '>= 4.2'
   s.add_dependency 'redis-namespace',  '>= 1.5'
-  s.add_dependency 'callsite',  '>= 0.0'
+  s.add_dependency 'callsite',  '>= 0.0.1'
+  s.add_dependency 'get_process_mem',  '~> 0'
 end

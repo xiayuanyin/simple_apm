@@ -12,5 +12,8 @@ module SimpleApm
     APP_NAME = ApmSettings['app_name'].presence || 'app'
     # SQL临界值
     SQL_CRITICAL_TIME = ApmSettings['sql_critical_time'].to_f
+    # 不纳入统计的action
+    t = ApmSettings['exclude_actions']
+    EXCLUDE_ACTIONS = t.is_a?(Array) ? t : [t]
   end
 end
