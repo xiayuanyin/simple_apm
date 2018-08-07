@@ -5,11 +5,15 @@ module SimpleApm
                   :during, :started, :db_runtime, :view_runtime,
                   :controller, :action, :format, :method,
                   :host, :remote_addr, :url, :completed_memory, :memory_during,
-                  :exception, :status
+                  :exception, :status, :net_http_during
     def initialize(h)
       h.each do |k, v|
         send("#{k}=", v) rescue puts "attr #{k} not set!"
       end
+    end
+
+    def net_http_requests
+      @requests ||= SimpleApm::HttpRequest.find_by_request_id(request_id)
     end
 
     def sqls

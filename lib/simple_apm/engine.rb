@@ -9,6 +9,7 @@ module SimpleApm
         SimpleApm::ProcessingThread.start!
         Thread.current['action_dispatch.request_id'] = env['action_dispatch.request_id']
         Thread.current[:current_process_memory] = GetProcessMem.new.mb
+        Thread.current[:net_http_during] = 0.0
       end
       @app.call(env)
     end

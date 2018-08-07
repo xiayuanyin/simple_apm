@@ -11,7 +11,9 @@
   <label>响应时间：</label>
   <span>
   <%= sec_str @request.during %>
-    （数据库：<%= sec_str @request.db_runtime %>, View: <%= sec_str @request.view_runtime %>）
+    （数据库：<%= sec_str @request.db_runtime %>,
+    View: <%= sec_str @request.view_runtime %>,
+    外部请求: <%= sec_str @request.net_http_during %>）
 </span>
 </p>
 <p>
@@ -32,42 +34,65 @@
 <% if @request.exception.present? && @request.exception != 'null' %>
   <p>
     <label>报错信息: </label>
-    <pre><%= @request.exception %></pre>
+  <pre><%= @request.exception %></pre>
   </p>
 <% end %>
-<table id="sql-table" class="table">
-  <thead>
-  <tr>
-    <td>time</td>
-    <td>name</td>
-    <td>sql</td>
-    <td>时间(ms)</td>
-    <td>位置</td>
-  </tr>
-  </thead>
-  <tbody>
-  <% @request.sqls.each do |sql| %>
+<% if @request.net_http_requests.present? %>
+  <p>外部请求</p>
+  <table class="table table-bordered">
     <tr>
-      <td><%= time_label sql.started %></td>
-      <td>
-          <%= sql.name %>
-      </td>
-      <td>
-        <div class="sql"><%= sql.full_sql -%></div>
-      </td>
-      <td><%= sec_str sql.during %></td>
-      <td><%= sql.filename %>:<%= sql.line %></td>
+      <th>开始时间</th>
+      <th>URL</th>
+      <th>耗时</th>
+      <th>其他信息</th>
     </tr>
-  <% end %>
-  </tbody>
-</table>
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('#sql-table').DataTable({
-      bPaginate: false,
-      // 自定义的排序方法
-      aoColumnDefs: [{sType: "sec", aTargets: [3]}]
-    })
+    <% @request.net_http_requests.each do |r| %>
+      <tr>
+        <td><%= r.started %></td>
+        <td><%= r.url %></td>
+        <td><%= sec_str r.during %></td>
+        <td><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
 
-  })
-</script>
+<% if @request.sqls.present? %>
+  <p>SQL列表</p>
+  <table id="sql-table" class="table">
+    <thead>
+    <tr>
+      <td>time</td>
+      <td>name</td>
+      <td>sql</td>
+      <td>时间(ms)</td>
+      <td>位置</td>
+    </tr>
+    </thead>
+    <tbody>
+    <% @request.sqls.each do |sql| %>
+      <tr>
+        <td><%= time_label sql.started %></td>
+        <td>
+          <%= sql.name %>
+        </td>
+        <td>
+          <div class="sql"><%= sql.full_sql -%></div>
+        </td>
+        <td><%= sec_str sql.during %></td>
+        <td><%= sql.filename %>:<%= sql.line %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <script type="text/javascript">
+      $(document).ready(function () {
+          $('#sql-table').DataTable({
+              bPaginate: false,
+              // 自定义的排序方法
+              aoColumnDefs: [{sType: "sec", aTargets: [3]}]
+          })
+
+      })
+  </script>
+<% end %>

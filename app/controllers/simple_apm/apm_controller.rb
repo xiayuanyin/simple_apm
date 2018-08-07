@@ -24,6 +24,7 @@ module SimpleApm
               sec_str(request.during),
               sec_str(request.db_runtime),
               sec_str(request.view_runtime),
+              sec_str(request.net_http_during),
               request.memory_during.to_f.round(1),
               request.host,
               request.remote_addr
