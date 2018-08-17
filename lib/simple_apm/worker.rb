@@ -31,6 +31,7 @@ module SimpleApm
           if request_id.present?
             if need_skip
               SimpleApm::Sql.delete_by_request_id(request_id)
+              SimpleApm::HttpRequest.delete_by_request_id(request_id)
             else
               action_name = "#{payload[:controller]}##{payload[:action]}"
               memory_during = completed_memory - started_memory rescue 0
@@ -62,11 +63,12 @@ module SimpleApm
                 SimpleApm::Request.create info
               else
                 SimpleApm::Sql.delete_by_request_id(request_id)
+                SimpleApm::HttpRequest.delete_by_request_id(request_id)
               end
             end
           end
         rescue => e
-          Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace.join("\n")
+          ErrorLogger.log e.backtrace.join("\n")
         end
       end
 
@@ -93,7 +95,7 @@ module SimpleApm
             SimpleApm::Sql.create request_id, info
           end
         rescue => e
-          Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace.join("\n")
+          ErrorLogger.log e.backtrace.join("\n")
         end
       end
 
@@ -119,7 +121,7 @@ module SimpleApm
             SimpleApm::HttpRequest.create request_id, info
           end
         rescue => e
-          Logger.new("#{Rails.root}/log/simple_apm.log").info e.backtrace.join("\n")
+          ErrorLogger.log e.backtrace.join("\n")
         end
       end
     end

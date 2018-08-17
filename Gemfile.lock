@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple_apm (1.0.4)
+    simple_apm (1.0.7)
       callsite (>= 0.0.1)
       get_process_mem (~> 0)
       rails (>= 4.2)
