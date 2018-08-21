@@ -4,6 +4,7 @@
     <th>Name</th>
     <th>点击次数</th>
     <th>平均响应时间</th>
+    <th>平均http访问时间</th>
     <th>最快响应时间</th>
     <th>最慢响应时间</th>
   </tr>
@@ -14,6 +15,7 @@
       <td><%= link_to action.name, action_info_path(action_name: action.name) %></td>
       <td><%= action.click_count %></td>
       <td><%= sec_str action.avg_time %></td>
+      <td><%= sec_str action.avg_http_time %></td>
       <td><%= link_to sec_str(action.fast_time), show_path(id: action.fast_id) %></td>
       <td><%= link_to sec_str(action.slow_time), show_path(id: action.slow_id) %></td>
     </tr>

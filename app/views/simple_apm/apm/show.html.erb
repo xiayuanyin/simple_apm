@@ -48,7 +48,7 @@
     </tr>
     <% @request.net_http_requests.each do |r| %>
       <tr>
-        <td><%= r.started %></td>
+        <td><%= time_label r.started %></td>
         <td><%= r.url %></td>
         <td><%= sec_str r.during %></td>
         <td><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>

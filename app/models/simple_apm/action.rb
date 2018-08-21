@@ -1,7 +1,7 @@
 # 请求 Controller#Action
 module SimpleApm
   class Action
-    attr_accessor :name, :click_count, :time, :slow_time, :slow_id, :fast_time, :fast_id
+    attr_accessor :name, :click_count, :time, :http_time, :slow_time, :slow_id, :fast_time, :fast_id
 
     def initialize(h)
       h.each do |k, v|
@@ -19,6 +19,10 @@ module SimpleApm
     # @return [Array<SimpleApm::SlowRequest>]
     def slow_requests(limit = 20, offset = 0)
       @slow_requests ||= SimpleApm::SlowRequest.list_by_action(name, limit, offset)
+    end
+
+    def avg_http_time
+      http_time.to_f/click_count.to_i
     end
 
     def avg_time
@@ -39,6 +43,8 @@ module SimpleApm
         SimpleApm::Redis.hincrby _key, 'click_count', 1
         # 总时间
         SimpleApm::Redis.hincrbyfloat _key, 'time', h['during']
+        # 外部http访问时间
+        SimpleApm::Redis.hincrbyfloat _key, 'http_time', h['net_http_during']
         _slow = SimpleApm::Redis.hget _key, 'slow_time'
         if _slow.nil? || h['during'].to_f > _slow.to_f
           # 记录最慢访问
