@@ -29,7 +29,9 @@
     <tr>
       <td>
         <%= sec_str r.during %>
-        (DB: <%= sec_str r.db_runtime %> , View: <%= sec_str r.view_runtime %>)
+        (DB: <%= sec_str r.db_runtime %> ,
+        View: <%= sec_str r.view_runtime %>
+        <%= "HTTP: #{sec_str r.net_http_during}" if r.net_http_during.to_f > 0 %>)
       </td>
       <td><%= time_label r.started %></td>
       <td><%= link_to r.request_id, show_path(id: r.request_id) %></td>

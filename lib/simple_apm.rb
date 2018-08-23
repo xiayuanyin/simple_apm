@@ -27,7 +27,9 @@ module SimpleApm
     th = Thread.current['action_dispatch.request_id'].present? ? Thread.current : Thread.main
     request_id = th['action_dispatch.request_id']
     if request_id
-      during = finished - started
+      # Net::HTTP请求分两步，do_start和request，RestClient会预先do_start在调用request，HTTParty则会直接调用request
+      real_start_time = payload[:real_start_time] || started
+      during = finished - real_start_time
       th[:net_http_during] += during if th[:net_http_during]
       if dev_caller = caller.detect {|c| c.include?(Rails.root.to_s) && !c.include?('/vendor/')}
         c = ::Callsite.parse(dev_caller)
@@ -36,7 +38,7 @@ module SimpleApm
       ProcessingThread.add_event(
           name: name,
           request_id: request_id,
-          started: started, finished: finished,
+          started: real_start_time, finished: finished,
           payload: payload
       )
     end

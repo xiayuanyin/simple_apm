@@ -12,8 +12,8 @@
   <span>
   <%= sec_str @request.during %>
     （数据库：<%= sec_str @request.db_runtime %>,
-    View: <%= sec_str @request.view_runtime %>,
-    外部请求: <%= sec_str @request.net_http_during %>）
+    View: <%= sec_str @request.view_runtime %>
+    <%= ",外部请求: #{sec_str @request.net_http_during}" if @request.net_http_during.to_f>0 %>）
 </span>
 </p>
 <p>
@@ -42,15 +42,15 @@
   <table class="table table-bordered">
     <tr>
       <th>开始时间</th>
-      <th>URL</th>
       <th>耗时</th>
+      <th>URL</th>
       <th>其他信息</th>
     </tr>
     <% @request.net_http_requests.each do |r| %>
       <tr>
         <td><%= time_label r.started %></td>
-        <td><%= r.url %></td>
         <td><%= sec_str r.during %></td>
+        <td><%= r.url %></td>
         <td><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>
       </tr>
     <% end %>
