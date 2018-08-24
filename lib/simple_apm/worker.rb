@@ -22,6 +22,7 @@ module SimpleApm
         finished = event[:finished]
         started = event[:started]
         request_id = event[:request_id]
+        remote_addr = event[:remote_addr]
         net_http_during = event[:net_http_during]
         begin
           need_skip = payload[:controller] == 'SimpleApm::ApmController'
@@ -46,7 +47,7 @@ module SimpleApm
                   controller: payload[:controller],
                   action: payload[:action],
                   host: Socket.gethostname,
-                  remote_addr: (payload[:headers]['HTTP_X_REAL_IP'] rescue nil),
+                  remote_addr: remote_addr,
                   method: payload[:method],
                   completed_memory: completed_memory,
                   memory_during: memory_during,

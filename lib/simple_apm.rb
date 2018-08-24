@@ -10,8 +10,13 @@ module SimpleApm
   SimpleApm::NetHttp.install
 
   ActiveSupport::Notifications.subscribe('process_action.action_controller') do |name, started, finished, unique_id, payload|
+    remote_addr = (payload[:headers]['HTTP_X_REAL_IP'] rescue nil)
+    if remote_addr.blank? || remote_addr=='127.0.0.1'
+      remote_addr = (payload[:headers]['REMOTE_ADDR'] rescue nil)
+    end
     ProcessingThread.add_event(
         name: name,
+        remote_addr: remote_addr,
         request_id: Thread.current['action_dispatch.request_id'],
         started: started, finished: finished,
         payload: payload.reject{|k,v|k.to_s=='headers'},

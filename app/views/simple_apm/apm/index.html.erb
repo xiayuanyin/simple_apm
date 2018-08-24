@@ -1,15 +1,21 @@
-<table id="slow-requests" class="table">
+<style>
+  .container{
+    width: 90%;
+    min-width: 1200px;
+  }
+</style>
+<table id="slow-requests" class="table" style="width: 100%">
   <thead>
   <tr>
     <th>请求时间</th>
-    <th>action</th>
-    <th>总耗时</th>
-    <th>db_time</th>
-    <th>view time</th>
-    <th>外部http time</th>
-    <th>内存增幅(M)</th>
-    <th>host</th>
-    <th>remote_addr</th>
+    <th>ActionName</th>
+    <th>TotalTime</th>
+    <th>DB</th>
+    <th>View</th>
+    <th>HTTP</th>
+    <th>Memory(Mb)</th>
+    <th>server</th>
+    <th>ip</th>
   </tr>
   </thead>
 </table>
