@@ -36,7 +36,7 @@ module SimpleApm
       real_start_time = payload[:real_start_time] || started
       during = finished - real_start_time
       th[:net_http_during] += during if th[:net_http_during]
-      if dev_caller = caller.detect {|c| c.include?(Rails.root.to_s) && !c.include?('/vendor/')}
+      if dev_caller = caller.detect { |c| c.include?(Rails.root.to_s) }
         c = ::Callsite.parse(dev_caller)
         payload.merge!(:line => c.line, :filename => c.filename.to_s.gsub(Rails.root.to_s, ''), :method => c.method)
       end
@@ -74,12 +74,12 @@ module SimpleApm
         @processing_thread && @processing_thread[:events].push(e)
       end
       def start!
-        @main_thread ||= Thread.current
-        @processing_thread ||= Thread.new do
-          Thread.current.name = 'simple-apm-processing-thread'
-          Thread.current[:events] ||= []
+        @main_thread ||= ::Thread.current
+        @processing_thread ||= ::Thread.new do
+          ::Thread.current.name = 'simple-apm-processing-thread' if ::Thread.current.respond_to?(:name)
+          ::Thread.current[:events] ||= []
           loop do
-            while e = Thread.current[:events].shift
+            while e = ::Thread.current[:events].shift
               ::SimpleApm::Worker.process! e
             end
             sleep 0.5
