@@ -20,6 +20,7 @@
   <tr>
     <th>响应时间</th>
     <th>访问时间</th>
+    <th>内存波动</th>
     <th>请求id</th>
     <th>访问ip</th>
     <th>server</th>
@@ -34,6 +35,7 @@
         <%= "HTTP: #{sec_str r.net_http_during}" if r.net_http_during.to_f > 0 %>)
       </td>
       <td><%= time_label r.started %></td>
+      <td><%= r.memory_during.to_f.round(1) %></td>
       <td><%= link_to r.request_id, show_path(id: r.request_id) %></td>
       <td><%= r.remote_addr %></td>
       <td><%= r.host %></td>

@@ -14,6 +14,7 @@
     yAxis: {type: 'value'},
     series: [{
         type: 'line',
+        smooth: true,
         data: <%= @time_arr.to_json.html_safe %>
       }]
   })
@@ -29,6 +30,7 @@
     yAxis: {type: 'value'},
     series: [{
       type: 'line',
+      smooth: true,
       data: <%= @hits_arr.to_json.html_safe %>
     }]
   })
