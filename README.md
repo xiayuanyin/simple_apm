@@ -8,7 +8,7 @@
 - 记录慢请求的详情和对应SQL详情（多余的会删掉）
 - 以10分钟为刻度记录平均/最慢访问时间、次数等性能指标，并生成图表
 - 记录请求中外部http访问时间
-- (TODO)记录Sidekiq的整套信息
+
 
 ## 原理
 
@@ -19,6 +19,26 @@
 处理Instrument方式为开启一个不影响主线程的常驻线程，循环计算处理数据
 
 获取内存信息用到了gem: [get_process_mem](https://github.com/schneems/get_process_mem)，经测试在linux系统耗时在1ms以下
+
+
+## 功能截图
+- Dashboard
+![Dashboard](public/dashboard.jpg)
+
+- 慢请求列表
+![Slow Requests](public/slow_requests.png)
+
+- Action列表
+![Action List](public/action_list.png)
+
+- 请求详情
+![Request Info](public/request_info.png)
+
+- Action概况
+![Action Info](public/action_info.png)
+
+- 数据管理
+![Data](public/data-manage.png)
 
 
 ## Usage
