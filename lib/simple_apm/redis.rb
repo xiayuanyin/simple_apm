@@ -80,6 +80,18 @@ module SimpleApm
 
   class RedisKey
     class << self
+      def set_query_date(d = nil)
+        if block_given?
+          _ = query_date
+          Thread.current['apm_query_date'] = d
+          res = yield
+          Thread.current['apm_query_date'] = _
+          res
+        else
+          Thread.current['apm_query_date'] = d
+        end
+      end
+
       def query_date=(d = nil)
         Thread.current['apm_query_date'] = d
       end

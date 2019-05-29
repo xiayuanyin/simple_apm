@@ -24,7 +24,7 @@ module SimpleApm
     class << self
 
       def find(id)
-        SimpleApm::Request.new JSON.parse(SimpleApm::Redis.hget(key, id))
+        SimpleApm::Request.new JSON.parse(SimpleApm::Redis.hget(key, id)) rescue nil
       end
 
       def create(h)

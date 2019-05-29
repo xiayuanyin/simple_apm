@@ -17,7 +17,7 @@ module SimpleApm
       respond_to do |format|
         format.json do
           @slow_requests = SimpleApm::SlowRequest.list(params[:count] || 200).map do |r|
-            request = r.request
+            request = r.request rescue next
             [
               link_to(time_label(request.started), show_path(id: request.request_id)),
               link_to(request.action_name, action_info_path(action_name: request.action_name)),
@@ -29,7 +29,7 @@ module SimpleApm
               request.host,
               request.remote_addr
             ]
-          end
+          end.compact
           render json: {data: @slow_requests}
         end
         format.html

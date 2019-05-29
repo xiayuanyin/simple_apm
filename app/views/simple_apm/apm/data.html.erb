@@ -6,8 +6,8 @@
 <%= link_to '', data_delete_path(type: ''), class: 'btn' %>
 <p class="pull-right">
   <span class="text-danger">删除数据：</span>
-  <%= link_to '保留进一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一周以前的数据？' %>
-  <%= link_to '保留进一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一个月以前的数据？' %>
+  <%= link_to '保留一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一周以前的数据？' %>
+  <%= link_to '保留一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一个月以前的数据？' %>
 </p>
 
 <table class="table table-bordered">

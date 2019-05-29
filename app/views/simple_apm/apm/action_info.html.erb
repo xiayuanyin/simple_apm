@@ -26,7 +26,10 @@
     <th>server</th>
   </tr>
   <% @action.slow_requests.each do |slow_request| %>
-    <% r = slow_request.request %>
+    <%
+      r = slow_request.request
+      next if r.blank?
+    %>
     <tr>
       <td>
         <%= sec_str r.during %>
