@@ -1,6 +1,8 @@
+require 'dotenv/load'
+
 module SimpleApm
   class Setting
-    ApmSettings = YAML.load(IO.read("config/simple_apm.yml")) rescue {}
+    ApmSettings = YAML.load(ERB.new(File.read("config/simple_apm.yml")).result) rescue {}
     REDIS_URL = ApmSettings['redis_url'].presence || 'redis://localhost:6379/0'
     # nil , hiredis ...
     REDIS_DRIVER = ApmSettings['redis_driver']
