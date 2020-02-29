@@ -104,7 +104,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (12.3.1)
+    rake (13.0.1)
     redis (4.0.1)
     redis-namespace (1.6.0)
       redis (>= 3.0.4)
