@@ -1,24 +1,38 @@
-<style>
-  .container{
-    width: 90%;
-    min-width: 1200px;
-  }
-</style>
-<table id="slow-requests" class="table" style="width: 100%">
-  <thead>
-  <tr>
-    <th>请求时间</th>
-    <th>ActionName</th>
-    <th>TotalTime</th>
-    <th>DB</th>
-    <th>View</th>
-    <th>HTTP</th>
-    <th>Memory(Mb)</th>
-    <th>server</th>
-    <th>ip</th>
-  </tr>
-  </thead>
-</table>
+<div class="apm-page-header">
+  <div>
+    <h1 class="apm-page-title">慢事务列表</h1>
+    <p class="apm-page-subtitle">按响应耗时排序，快速定位 DB、SQL、View 和外部请求占比。</p>
+  </div>
+</div>
+
+<section class="apm-panel">
+  <div class="apm-panel-header">
+    <div>
+      <h2 class="apm-panel-title">请求样本</h2>
+      <p class="apm-panel-subtitle">默认加载最近的慢请求记录。</p>
+    </div>
+  </div>
+  <div class="apm-panel-body">
+    <div class="apm-table-wrap">
+      <table id="slow-requests" class="table">
+        <thead>
+        <tr>
+          <th>请求时间</th>
+          <th>ActionName</th>
+          <th>TotalTime</th>
+          <th>DB</th>
+          <th>SQL</th>
+          <th>View</th>
+          <th>HTTP</th>
+          <th>Memory(Mb)</th>
+          <th>server</th>
+          <th>ip</th>
+        </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+</section>
 
 <script type="text/javascript">
   $(document).ready(function () {

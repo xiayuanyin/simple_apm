@@ -1,33 +1,70 @@
-<% if SimpleApm::Redis.running? %>
-  <%= link_to '暂停收集数据', data_delete_path(type: 'stop_data'), class: 'btn btn-warning btn-sm', 'data-confirm'=>'确定暂停吗？' %>
-<% else %>
-  <%= link_to '继续收集数据', data_delete_path(type: 'rerun_data'), class: 'btn btn-primary btn-sm' %>
-<% end %>
-<%= link_to '', data_delete_path(type: ''), class: 'btn' %>
-<p class="pull-right">
-  <span class="text-danger">删除数据：</span>
-  <%= link_to '保留一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一周以前的数据？' %>
-  <%= link_to '保留一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一个月以前的数据？' %>
-</p>
+<div class="apm-page-header">
+  <div>
+    <h1 class="apm-page-title">数据管理</h1>
+    <p class="apm-page-subtitle">管理采集开关和历史 Redis 数据。</p>
+  </div>
+</div>
 
-<table class="table table-bordered">
-  <thead>
-  <tr>
-    <th>日期</th>
-    <th>请求数量</th>
-    <th>平均响应时间</th>
-    <th>操作</th>
-  </tr>
-  </thead>
-  <tbody>
-  <!--  {day: date_str, hits: hits, time: time, avg_time: avg_time}-->
-  <% @data.each do |d| %>
-    <tr>
-      <td><%= d[:day] %></td>
-      <td><%= d[:hits] %></td>
-      <td><%= sec_str d[:avg_time] %></td>
-      <td><%= link_to '删除', data_delete_path(date: d[:day]), 'data-confirm' => '确定删除？' %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+<section class="apm-panel">
+  <div class="apm-panel-header">
+    <div>
+      <h2 class="apm-panel-title">采集状态</h2>
+      <p class="apm-panel-subtitle">暂停后 middleware 不再记录新的请求性能数据。</p>
+    </div>
+    <div class="apm-toolbar-actions">
+      <% if SimpleApm::Redis.running? %>
+        <span class="apm-status apm-status-ok">运行中</span>
+        <%= link_to '暂停收集数据', data_delete_path(type: 'stop_data'), class: 'btn btn-warning btn-sm', 'data-confirm'=>'确定暂停吗？' %>
+      <% else %>
+        <span class="apm-status apm-status-danger">已暂停</span>
+        <%= link_to '继续收集数据', data_delete_path(type: 'rerun_data'), class: 'btn btn-primary btn-sm' %>
+      <% end %>
+    </div>
+  </div>
+  <div class="apm-panel-body">
+    <div class="apm-toolbar">
+      <div>
+        <strong>删除数据</strong>
+        <p class="apm-page-subtitle">按保留周期清理历史数据，或删除单日数据。</p>
+      </div>
+      <div class="apm-toolbar-actions">
+        <%= link_to '保留一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一周以前的数据？' %>
+        <%= link_to '保留一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一个月以前的数据？' %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="apm-panel">
+  <div class="apm-panel-header">
+    <div>
+      <h2 class="apm-panel-title">历史数据</h2>
+      <p class="apm-panel-subtitle">以日期为单位查看采集量和平均响应时间。</p>
+    </div>
+  </div>
+  <div class="apm-panel-body">
+    <div class="apm-table-wrap">
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>日期</th>
+          <th>请求数量</th>
+          <th>平均响应时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--  {day: date_str, hits: hits, time: time, avg_time: avg_time}-->
+        <% @data.each do |d| %>
+          <tr>
+            <td><%= d[:day] %></td>
+            <td><%= d[:hits] %></td>
+            <td><%= sec_str d[:avg_time] %></td>
+            <td><%= link_to '删除', data_delete_path(date: d[:day]), class: 'apm-danger-link', 'data-confirm' => '确定删除？' %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

@@ -3,6 +3,7 @@ module SimpleApm
   class Request
     attr_accessor :request_id, :action_name,
                   :during, :started, :db_runtime, :view_runtime,
+                  :queries_count, :cached_queries_count,
                   :controller, :action, :format, :method,
                   :host, :remote_addr, :url, :completed_memory, :memory_during,
                   :exception, :status, :net_http_during

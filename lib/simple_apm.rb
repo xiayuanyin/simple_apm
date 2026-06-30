@@ -3,11 +3,20 @@ require 'simple_apm/redis'
 require 'simple_apm/engine'
 require 'simple_apm/worker'
 require 'simple_apm/net_http'
-require 'callsite'
 require 'get_process_mem'
 module SimpleApm
 
   SimpleApm::NetHttp.install
+
+  def self.merge_callsite_payload!(payload, locations = caller_locations)
+    if dev_caller = locations.detect { |location| location.path.include?(Rails.root.to_s) }
+      payload.merge!(
+        :line => dev_caller.lineno,
+        :filename => dev_caller.path.gsub(Rails.root.to_s, ''),
+        :method => dev_caller.base_label
+      )
+    end
+  end
 
   ActiveSupport::Notifications.subscribe('process_action.action_controller') do |name, started, finished, unique_id, payload|
     remote_addr = (payload[:headers]['HTTP_X_REAL_IP'] rescue nil)
@@ -36,10 +45,7 @@ module SimpleApm
       real_start_time = payload[:real_start_time] || started
       during = finished - real_start_time
       th[:net_http_during] += during if th[:net_http_during]
-      if dev_caller = caller.detect { |c| c.include?(Rails.root.to_s) }
-        c = ::Callsite.parse(dev_caller)
-        payload.merge!(:line => c.line, :filename => c.filename.to_s.gsub(Rails.root.to_s, ''), :method => c.method)
-      end
+      SimpleApm.merge_callsite_payload!(payload)
       ProcessingThread.add_event(
           name: name,
           request_id: request_id,
@@ -52,10 +58,7 @@ module SimpleApm
   ActiveSupport::Notifications.subscribe 'sql.active_record' do |name, started, finished, unique_id, payload|
     request_id = Thread.current['action_dispatch.request_id'].presence || Thread.main['action_dispatch.request_id']
     if request_id
-      if dev_caller = caller.detect {|c| c.include? Rails.root.to_s}
-        c = ::Callsite.parse(dev_caller)
-        payload.merge!(:line => c.line, :filename => c.filename.to_s.gsub(Rails.root.to_s, ''), :method => c.method)
-      end
+      SimpleApm.merge_callsite_payload!(payload)
       ProcessingThread.add_event(
           name: name,
           request_id: request_id,

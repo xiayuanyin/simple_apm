@@ -1,7 +1,8 @@
 # 请求 Controller#Action
 module SimpleApm
   class Action
-    attr_accessor :name, :click_count, :time, :http_time, :slow_time, :slow_id, :fast_time, :fast_id
+    attr_accessor :name, :click_count, :time, :db_time, :queries_count, :cached_queries_count,
+                  :http_time, :slow_time, :slow_id, :fast_time, :fast_id
 
     def initialize(h)
       h.each do |k, v|
@@ -25,6 +26,18 @@ module SimpleApm
       http_time.to_f/click_count.to_i
     end
 
+    def avg_db_time
+      db_time.to_f/click_count.to_i
+    end
+
+    def avg_queries_count
+      queries_count.to_f/click_count.to_i
+    end
+
+    def avg_cached_queries_count
+      cached_queries_count.to_f/click_count.to_i
+    end
+
     def avg_time
       time.to_f/click_count.to_i
     end
@@ -43,6 +56,12 @@ module SimpleApm
         SimpleApm::Redis.hincrby _key, 'click_count', 1
         # 总时间
         SimpleApm::Redis.hincrbyfloat _key, 'time', h['during']
+        # 数据库访问时间
+        SimpleApm::Redis.hincrbyfloat _key, 'db_time', h['db_runtime']
+        # SQL执行次数
+        SimpleApm::Redis.hincrby _key, 'queries_count', h['queries_count'].to_i
+        # SQL缓存命中次数
+        SimpleApm::Redis.hincrby _key, 'cached_queries_count', h['cached_queries_count'].to_i
         # 外部http访问时间
         SimpleApm::Redis.hincrbyfloat _key, 'http_time', h['net_http_during']
         _slow = SimpleApm::Redis.hget _key, 'slow_time'

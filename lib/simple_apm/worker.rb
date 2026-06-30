@@ -44,6 +44,8 @@ module SimpleApm
                   started: started.to_s,
                   db_runtime: payload[:db_runtime].to_f / 1000,
                   view_runtime: payload[:view_runtime].to_f / 1000,
+                  queries_count: payload[:queries_count].to_i,
+                  cached_queries_count: payload[:cached_queries_count].to_i,
                   controller: payload[:controller],
                   action: payload[:action],
                   host: Socket.gethostname,

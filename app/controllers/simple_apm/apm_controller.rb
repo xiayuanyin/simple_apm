@@ -23,6 +23,7 @@ module SimpleApm
               link_to(request.action_name, action_info_path(action_name: request.action_name)),
               sec_str(request.during),
               sec_str(request.db_runtime),
+              request.queries_count,
               sec_str(request.view_runtime),
               sec_str(request.net_http_during),
               request.memory_during.to_f.round(1),

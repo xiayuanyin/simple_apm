@@ -7,49 +7,11 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+  <%= stylesheet_link_tag "simple_apm/application", media: "all" %>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.js"></script>
   <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-  <style>
-    footer {
-      text-align: center;
-      padding: 10px;
-      border-top: 1px solid #999999;
-    }
-
-    a.navbar-brand.active {
-      color: #00AEEF !important;
-    }
-
-    #page-container {
-      min-height: 80vh;
-    }
-
-    .select-apm-date {
-      width: auto;
-      float: right;
-      margin-top: 8px;
-    }
-
-    .select-apm-date > select {
-      display: inline-block;
-      width: auto;
-    }
-
-    .sql {
-      max-width: 300px;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      color: #00AEEF;
-      cursor: pointer;
-    }
-
-    pre {
-      white-space: pre-wrap;
-    }
-  </style>
   <script type="text/javascript">
       // JqueryDataTable自定义排序方法
       jQuery.extend(jQuery.fn.dataTableExt.oSort, {
@@ -79,11 +41,15 @@
 
   <%= csrf_meta_tags %>
 </head>
-<body>
-<div id="page-container">
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
+<body class="simple-apm">
+<div id="page-container" class="apm-shell">
+  <nav class="apm-topbar">
+    <div class="apm-topbar-inner">
+      <div class="apm-brand">
+        <span class="apm-brand-mark">SA</span>
+        <span class="apm-brand-name">Simple APM</span>
+      </div>
+      <div class="apm-nav">
         <%
           [
             [dashboard_path, 'Dashboard'],
@@ -98,36 +64,37 @@
           </a>
         <% end %>
       </div>
-      <div class="select-apm-date">
-        统计日期
+      <div class="select-apm-date apm-date-select">
+        <span>统计日期</span>
         <%= select_tag 'apm_date', options_for_select(SimpleApm::Redis.in_apm_days, apm_date), class: 'form-control' %>
       </div>
-
     </div>
   </nav>
-  <div class="container" style="margin-top: 55px">
+  <main class="apm-content">
     <%= yield %>
-  </div>
+  </main>
 </div>
-<footer style="text-align: center">
-  <% SimpleApm::Redis.simple_info.each do |k, v| %>
-    <label><%= k %>：</label><span><%= v %></span>
-  <% end %>
-  <p>
+<footer class="apm-footer">
+  <div class="apm-footer-status">
     <% if SimpleApm::Redis.running? %>
-      <span style="color: greenyellow">数据收集中……</span>
+      <span class="apm-status apm-status-ok">数据收集中</span>
     <% else %>
-      <span style="color: red">已暂停</span>
+      <span class="apm-status apm-status-danger">已暂停</span>
     <% end %>
-  </p>
+  </div>
+  <div class="apm-footer-meta">
+    <% SimpleApm::Redis.simple_info.each do |k, v| %>
+      <span><label><%= k %>：</label><%= v %></span>
+    <% end %>
+  </div>
 </footer>
 <div id="sql-modal" class="modal" aria-hidden="true" role="dialog" style="display: none;" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-popout">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <div class="panel-title">SQL</div>
+    <div class="apm-modal-panel">
+      <div class="apm-modal-header">
+        <div class="apm-modal-title">SQL</div>
       </div>
-      <div class="panel-body">
+      <div class="apm-modal-body">
         <pre class="modal-content" data-lang="SQL"></pre>
       </div>
     </div>

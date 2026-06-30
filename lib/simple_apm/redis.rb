@@ -62,12 +62,12 @@ module SimpleApm
       end
 
       def rerun!
-        hset('status', 'running', true)
+        hset('status', 'running', 'true')
       end
 
       # 停止收集数据
       def stop!
-        hset('status', 'running', false)
+        hset('status', 'running', 'false')
       end
 
       def method_missing(method, *args)

@@ -1,6 +1,16 @@
+require 'erb'
+
 module SimpleApm
   class Setting
-    ApmSettings = YAML.load(IO.read("config/simple_apm.yml")) rescue {}
+    def self.load_settings(path = "config/simple_apm.yml")
+      yaml = ERB.new(File.read(path)).result
+      settings = YAML.safe_load(yaml, aliases: true) || {}
+      settings.is_a?(Hash) ? settings : {}
+    rescue
+      {}
+    end
+
+    ApmSettings = load_settings
     REDIS_URL = ApmSettings['redis_url'].presence || 'redis://localhost:6379/0'
     # nil , hiredis ...
     REDIS_DRIVER = ApmSettings['redis_driver']

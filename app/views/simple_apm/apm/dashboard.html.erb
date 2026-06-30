@@ -1,37 +1,123 @@
-<div id="time_chart" style="height: 400px;width: auto"></div>
-<div id="hits_chart" style="height: 400px;width: auto"></div>
+<div class="apm-page-header">
+  <div>
+    <h1 class="apm-page-title">性能概览</h1>
+    <p class="apm-page-subtitle">按 10 分钟粒度观察响应时间和访问量趋势。</p>
+  </div>
+</div>
+
+<div class="apm-metrics">
+  <div class="apm-stat">
+    <p class="apm-stat-label">统计点</p>
+    <div class="apm-stat-value"><%= @x_names.length %></div>
+    <div class="apm-stat-meta">10 分钟区间</div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">访问次数</p>
+    <div class="apm-stat-value"><%= @hits_arr.map(&:to_i).sum %></div>
+    <div class="apm-stat-meta">当前日期累计</div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">最高平均响应</p>
+    <div class="apm-stat-value"><%= sec_str(@time_arr.map(&:to_f).max.to_f) %></div>
+    <div class="apm-stat-meta">区间峰值</div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">当前采集</p>
+    <div class="apm-stat-value">
+      <% if SimpleApm::Redis.running? %>
+        <span class="apm-status apm-status-ok">运行中</span>
+      <% else %>
+        <span class="apm-status apm-status-danger">已暂停</span>
+      <% end %>
+    </div>
+    <div class="apm-stat-meta">Redis 状态</div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">查询日期</p>
+    <div class="apm-stat-value"><%= SimpleApm::RedisKey.query_date || Time.now.strftime('%Y-%m-%d') %></div>
+    <div class="apm-stat-meta">可在右上角切换</div>
+  </div>
+</div>
+
+<div class="apm-grid">
+  <section class="apm-panel apm-col-6">
+    <div class="apm-panel-header">
+      <div>
+        <h2 class="apm-panel-title">响应时间</h2>
+        <p class="apm-panel-subtitle">每个时间段的平均响应耗时。</p>
+      </div>
+    </div>
+    <div class="apm-panel-body">
+      <div id="time_chart" class="apm-chart"></div>
+    </div>
+  </section>
+
+  <section class="apm-panel apm-col-6">
+    <div class="apm-panel-header">
+      <div>
+        <h2 class="apm-panel-title">访问次数</h2>
+        <p class="apm-panel-subtitle">每个时间段的请求数量。</p>
+      </div>
+    </div>
+    <div class="apm-panel-body">
+      <div id="hits_chart" class="apm-chart"></div>
+    </div>
+  </section>
+</div>
+
 <script>
   var time_chart = echarts.init(document.getElementById('time_chart')),
       hits_chart = echarts.init(document.getElementById('hits_chart'));
   time_chart.setOption({
-    title: {
-      text: '响应时间'
-    },
-    tooltip: {},
+    color: ['#0f766e'],
+    grid: {left: 48, right: 18, top: 24, bottom: 36},
+    tooltip: {trigger: 'axis'},
     xAxis: {
-      data: <%= @x_names.to_json.html_safe %>
+      data: <%= @x_names.to_json.html_safe %>,
+      axisLine: {lineStyle: {color: '#c8d2df'}},
+      axisLabel: {color: '#667085'}
     },
-    yAxis: {type: 'value'},
+    yAxis: {
+      type: 'value',
+      axisLine: {show: false},
+      splitLine: {lineStyle: {color: '#eef2f7'}},
+      axisLabel: {color: '#667085'}
+    },
     series: [{
         type: 'line',
         smooth: true,
+        symbolSize: 6,
+        areaStyle: {color: 'rgba(15, 118, 110, 0.10)'},
         data: <%= @time_arr.to_json.html_safe %>
       }]
   })
 
   hits_chart.setOption({
-    title: {
-      text: '访问次数'
-    },
-    tooltip: {},
+    color: ['#2563eb'],
+    grid: {left: 48, right: 18, top: 24, bottom: 36},
+    tooltip: {trigger: 'axis'},
     xAxis: {
-      data: <%= @x_names.to_json.html_safe %>
+      data: <%= @x_names.to_json.html_safe %>,
+      axisLine: {lineStyle: {color: '#c8d2df'}},
+      axisLabel: {color: '#667085'}
     },
-    yAxis: {type: 'value'},
+    yAxis: {
+      type: 'value',
+      axisLine: {show: false},
+      splitLine: {lineStyle: {color: '#eef2f7'}},
+      axisLabel: {color: '#667085'}
+    },
     series: [{
       type: 'line',
       smooth: true,
+      symbolSize: 6,
+      areaStyle: {color: 'rgba(37, 99, 235, 0.10)'},
       data: <%= @hits_arr.to_json.html_safe %>
     }]
+  })
+
+  $(window).on('resize', function () {
+    time_chart.resize()
+    hits_chart.resize()
   })
 </script>

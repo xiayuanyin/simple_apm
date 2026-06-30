@@ -1,90 +1,140 @@
-<h4><%= @request.action_name %>.<%= @request.format %>(<%= @request.method %>)</h4>
-<p>
-  <label>URL：</label>
-  <span><%= @request.url %></span>
-</p>
-<p>
-  <label>开始时间：</label>
-  <span><%= time_label @request.started, true %></span>
-</p>
-<p>
-  <label>响应时间：</label>
-  <span>
-  <%= sec_str @request.during %>
-    （数据库：<%= sec_str @request.db_runtime %>,
-    View: <%= sec_str @request.view_runtime %>
-    <%= ",外部请求: #{sec_str @request.net_http_during}" if @request.net_http_during.to_f>0 %>）
-</span>
-</p>
-<p>
-  <label>结束时内存：</label>
-  <span>
-  <%= @request.completed_memory.to_f.round(1) %>M
-    （增幅：<%= @request.memory_during.to_f.round(1) %>M）
-</span>
-</p>
-<p>
-  <label>server：</label>
-  <span><%= @request.host %></span>
-</p>
-<p>
-  <label>访问ip：</label>
-  <span><%= @request.remote_addr %></span>
-</p>
+<div class="apm-page-header">
+  <div>
+    <h1 class="apm-page-title">请求详情</h1>
+    <p class="apm-page-subtitle"><%= @request.action_name %>.<%= @request.format %>(<%= @request.method %>)</p>
+  </div>
+</div>
+
+<div class="apm-metrics">
+  <div class="apm-stat">
+    <p class="apm-stat-label">Total</p>
+    <div class="apm-stat-value"><%= sec_str @request.during %></div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">DB</p>
+    <div class="apm-stat-value"><%= sec_str @request.db_runtime %></div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">SQL</p>
+    <div class="apm-stat-value"><%= @request.queries_count.to_i %></div>
+    <div class="apm-stat-meta">缓存 <%= @request.cached_queries_count.to_i %></div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">View</p>
+    <div class="apm-stat-value"><%= sec_str @request.view_runtime %></div>
+  </div>
+  <div class="apm-stat">
+    <p class="apm-stat-label">HTTP</p>
+    <div class="apm-stat-value"><%= sec_str @request.net_http_during %></div>
+  </div>
+</div>
+
+<section class="apm-panel">
+  <div class="apm-panel-header">
+    <div>
+      <h2 class="apm-panel-title">基础信息</h2>
+      <p class="apm-panel-subtitle">请求来源、时间和内存变化。</p>
+    </div>
+  </div>
+  <div class="apm-panel-body">
+    <dl class="apm-detail-list">
+      <dt>URL</dt>
+      <dd><%= @request.url %></dd>
+      <dt>开始时间</dt>
+      <dd><%= time_label @request.started, true %></dd>
+      <dt>结束时内存</dt>
+      <dd><%= @request.completed_memory.to_f.round(1) %>M （增幅：<%= @request.memory_during.to_f.round(1) %>M）</dd>
+      <dt>server</dt>
+      <dd><%= @request.host %></dd>
+      <dt>访问ip</dt>
+      <dd><%= @request.remote_addr %></dd>
+    </dl>
+  </div>
+</section>
+
 <% if @request.exception.present? && @request.exception != 'null' %>
-  <p>
-    <label>报错信息: </label>
-  <pre><%= @request.exception %></pre>
-  </p>
+  <section class="apm-panel">
+    <div class="apm-panel-header">
+      <div>
+        <h2 class="apm-panel-title">报错信息</h2>
+      </div>
+    </div>
+    <div class="apm-panel-body">
+      <pre><%= @request.exception %></pre>
+    </div>
+  </section>
 <% end %>
+
 <% if @request.net_http_requests.present? %>
-  <p>外部请求</p>
-  <table class="table table-bordered">
-    <tr>
-      <th>开始时间</th>
-      <th>耗时</th>
-      <th>URL</th>
-      <th>其他信息</th>
-    </tr>
-    <% @request.net_http_requests.each do |r| %>
-      <tr>
-        <td><%= time_label r.started %></td>
-        <td><%= sec_str r.during %></td>
-        <td><%= r.url %></td>
-        <td><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>
-      </tr>
-    <% end %>
-  </table>
+  <section class="apm-panel">
+    <div class="apm-panel-header">
+      <div>
+        <h2 class="apm-panel-title">外部请求</h2>
+        <p class="apm-panel-subtitle">请求过程中触发的 Net::HTTP 调用。</p>
+      </div>
+    </div>
+    <div class="apm-panel-body">
+      <div class="apm-table-wrap">
+        <table class="table table-bordered">
+          <tr>
+            <th>开始时间</th>
+            <th>耗时</th>
+            <th>URL</th>
+            <th>其他信息</th>
+          </tr>
+          <% @request.net_http_requests.each do |r| %>
+            <tr>
+              <td><%= time_label r.started %></td>
+              <td><%= sec_str r.during %></td>
+              <td><%= r.url %></td>
+              <td><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </section>
 <% end %>
 
 <% if @request.sqls.present? %>
-  <p>SQL列表</p>
-  <table id="sql-table" class="table">
-    <thead>
-    <tr>
-      <td>time</td>
-      <td>name</td>
-      <td>sql</td>
-      <td>时间(ms)</td>
-      <td>位置</td>
-    </tr>
-    </thead>
-    <tbody>
-    <% @request.sqls.each do |sql| %>
-      <tr>
-        <td><%= time_label sql.started %></td>
-        <td>
-          <%= sql.name %>
-        </td>
-        <td>
-          <div class="sql"><%= sql.full_sql -%></div>
-        </td>
-        <td><%= sec_str sql.during %></td>
-        <td><%= sql.filename %>:<%= sql.line %></td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
+  <section class="apm-panel">
+    <div class="apm-panel-header">
+      <div>
+        <h2 class="apm-panel-title">SQL 列表</h2>
+        <p class="apm-panel-subtitle">点击 SQL 文本查看完整语句。</p>
+      </div>
+    </div>
+    <div class="apm-panel-body">
+      <div class="apm-table-wrap">
+        <table id="sql-table" class="table">
+          <thead>
+          <tr>
+            <td>time</td>
+            <td>name</td>
+            <td>sql</td>
+            <td>时间(ms)</td>
+            <td>位置</td>
+          </tr>
+          </thead>
+          <tbody>
+          <% @request.sqls.each do |sql| %>
+            <tr>
+              <td><%= time_label sql.started %></td>
+              <td>
+                <%= sql.name %>
+              </td>
+              <td>
+                <div class="sql"><%= sql.full_sql -%></div>
+              </td>
+              <td><%= sec_str sql.during %></td>
+              <td><%= sql.filename %>:<%= sql.line %></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
   <script type="text/javascript">
       $(document).ready(function () {
           $('#sql-table').DataTable({
