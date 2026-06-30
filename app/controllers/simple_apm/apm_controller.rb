@@ -54,6 +54,11 @@ module SimpleApm
       redirect_to request.referer
     end
 
+    def set_locale
+      session[:simple_apm_locale] = params[:locale] if AVAILABLE_LOCALES.include?(params[:locale])
+      redirect_back fallback_location: dashboard_path
+    end
+
     def data
       @data = SimpleApm::Redis.in_apm_days.map {|x| SimpleApm::Hit.day_info(x)}
     end
@@ -61,21 +66,21 @@ module SimpleApm
     def data_delete
       if params[:date].is_a?(String)
         r = SimpleApm::Redis.clear_data(params[:date])
-        flash[:notice] = r[:success] ? '删除成功！' : r[:msg]
+        flash[:notice] = r[:success] ? t("simple_apm.flash.deleted") : t("simple_apm.flash.no_data_for_day")
       elsif params[:type]=='month'
         del_count = SimpleApm::Redis.clear_data_before_time(Time.now.at_beginning_of_day - 1.month)
-        flash[:notice] = "成功删除#{del_count}条数据"
+        flash[:notice] = t("simple_apm.flash.deleted_count", count: del_count)
       elsif params[:type]=='week'
         del_count = SimpleApm::Redis.clear_data_before_time(Time.now.at_beginning_of_day - 1.week)
-        flash[:notice] = "成功删除#{del_count}条数据"
+        flash[:notice] = t("simple_apm.flash.deleted_count", count: del_count)
       elsif params[:type]=='stop_data'
         SimpleApm::Redis.stop!
-        flash[:notice] = '设置成功！'
+        flash[:notice] = t("simple_apm.flash.updated")
       elsif params[:type]=='rerun_data'
         SimpleApm::Redis.rerun!
-        flash[:notice] = '设置成功！'
+        flash[:notice] = t("simple_apm.flash.updated")
       else
-        flash[:notice] = '未知操作！'
+        flash[:notice] = t("simple_apm.flash.unknown_action")
         # r = params[:date].map{|d|SimpleApm::Redis.clear_data(d)}
         # suc, fail = r.partition{|x|x[:success]}
         # flash[:notice] = "成功删除#{suc.length}"

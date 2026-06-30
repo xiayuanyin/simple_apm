@@ -144,6 +144,36 @@ body.simple-apm {
   box-shadow: none;
 }
 
+.apm-language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  flex: 0 0 auto;
+}
+
+.apm-language-switch a {
+  padding: 5px 8px;
+  color: #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.apm-language-switch a:hover,
+.apm-language-switch a:focus {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.apm-language-switch a.active {
+  color: #052e2b;
+  background: #5eead4;
+  font-weight: 700;
+}
+
 .apm-content {
   width: min(1440px, calc(100% - 48px));
   margin: 0 auto;
@@ -539,6 +569,10 @@ pre {
     margin-left: auto;
   }
 
+  .apm-language-switch {
+    margin-left: auto;
+  }
+
   .apm-page-header,
   .apm-toolbar {
     align-items: flex-start;
@@ -562,6 +596,11 @@ pre {
   .apm-date-select {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .apm-language-switch {
+    width: 100%;
+    justify-content: center;
   }
 
   .apm-date-select select.form-control {

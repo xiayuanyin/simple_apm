@@ -52,10 +52,10 @@
       <div class="apm-nav">
         <%
           [
-            [dashboard_path, 'Dashboard'],
-            [index_path, '慢事务列表'],
-            [actions_path, 'ActionList'],
-            [data_path, '数据管理']
+            [dashboard_path, t("simple_apm.layout.nav_dashboard")],
+            [index_path, t("simple_apm.layout.nav_slow_requests")],
+            [actions_path, t("simple_apm.layout.nav_actions")],
+            [data_path, t("simple_apm.layout.nav_data")]
           ].each do |m|
         %>
           <a class="navbar-brand <%= 'active' if request.url =~ /#{m[0]}/ %>"
@@ -64,8 +64,15 @@
           </a>
         <% end %>
       </div>
+      <div class="apm-language-switch" aria-label="<%= t("simple_apm.layout.language") %>">
+        <% SimpleApm::ApplicationController::AVAILABLE_LOCALES.each do |locale| %>
+          <%= link_to t("simple_apm.locales.#{locale}"),
+                      set_locale_path(locale: locale),
+                      class: ("active" if simple_apm_locale == locale) %>
+        <% end %>
+      </div>
       <div class="select-apm-date apm-date-select">
-        <span>统计日期</span>
+        <span><%= t("simple_apm.layout.date") %></span>
         <%= select_tag 'apm_date', options_for_select(SimpleApm::Redis.in_apm_days, apm_date), class: 'form-control' %>
       </div>
     </div>
@@ -77,14 +84,32 @@
 <footer class="apm-footer">
   <div class="apm-footer-status">
     <% if SimpleApm::Redis.running? %>
-      <span class="apm-status apm-status-ok">数据收集中</span>
+      <span class="apm-status apm-status-ok"><%= t("simple_apm.layout.collected") %></span>
     <% else %>
-      <span class="apm-status apm-status-danger">已暂停</span>
+      <span class="apm-status apm-status-danger"><%= t("simple_apm.common.paused") %></span>
     <% end %>
   </div>
   <div class="apm-footer-meta">
     <% SimpleApm::Redis.simple_info.each do |k, v| %>
-      <span><label><%= k %>：</label><%= v %></span>
+      <%
+        redis_label_key =
+          case k
+          when '系统内存'
+            'system_memory'
+          when '当前内存占用'
+            'current_memory'
+          when '当前内存占用(rss)'
+            'current_memory_rss'
+          when '占用内存峰值'
+            'peak_memory'
+          when 'redis版本'
+            'redis_version'
+          when /db[0-9]+/
+            'db'
+          end
+        redis_label = redis_label_key ? t("simple_apm.layout.redis_info.#{redis_label_key}") : k
+      %>
+      <span><label><%= redis_label %>：</label><%= v %></span>
     <% end %>
   </div>
 </footer>

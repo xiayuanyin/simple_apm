@@ -1,35 +1,35 @@
 <div class="apm-page-header">
   <div>
-    <h1 class="apm-page-title">数据管理</h1>
-    <p class="apm-page-subtitle">管理采集开关和历史 Redis 数据。</p>
+    <h1 class="apm-page-title"><%= t("simple_apm.data.title") %></h1>
+    <p class="apm-page-subtitle"><%= t("simple_apm.data.subtitle") %></p>
   </div>
 </div>
 
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
-      <h2 class="apm-panel-title">采集状态</h2>
-      <p class="apm-panel-subtitle">暂停后 middleware 不再记录新的请求性能数据。</p>
+      <h2 class="apm-panel-title"><%= t("simple_apm.data.collection_status") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.data.collection_subtitle") %></p>
     </div>
     <div class="apm-toolbar-actions">
       <% if SimpleApm::Redis.running? %>
-        <span class="apm-status apm-status-ok">运行中</span>
-        <%= link_to '暂停收集数据', data_delete_path(type: 'stop_data'), class: 'btn btn-warning btn-sm', 'data-confirm'=>'确定暂停吗？' %>
+        <span class="apm-status apm-status-ok"><%= t("simple_apm.common.running") %></span>
+        <%= link_to t("simple_apm.data.pause_collection"), data_delete_path(type: 'stop_data'), class: 'btn btn-warning btn-sm', 'data-confirm'=> t("simple_apm.data.confirm_pause") %>
       <% else %>
-        <span class="apm-status apm-status-danger">已暂停</span>
-        <%= link_to '继续收集数据', data_delete_path(type: 'rerun_data'), class: 'btn btn-primary btn-sm' %>
+        <span class="apm-status apm-status-danger"><%= t("simple_apm.common.paused") %></span>
+        <%= link_to t("simple_apm.data.resume_collection"), data_delete_path(type: 'rerun_data'), class: 'btn btn-primary btn-sm' %>
       <% end %>
     </div>
   </div>
   <div class="apm-panel-body">
     <div class="apm-toolbar">
       <div>
-        <strong>删除数据</strong>
-        <p class="apm-page-subtitle">按保留周期清理历史数据，或删除单日数据。</p>
+        <strong><%= t("simple_apm.data.delete_data") %></strong>
+        <p class="apm-page-subtitle"><%= t("simple_apm.data.delete_subtitle") %></p>
       </div>
       <div class="apm-toolbar-actions">
-        <%= link_to '保留一周数据', data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一周以前的数据？' %>
-        <%= link_to '保留一个月数据', data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm' => '确定删除所有一个月以前的数据？' %>
+        <%= link_to t("simple_apm.data.keep_one_week"), data_delete_path(type: 'week'), class: 'btn btn-danger', 'data-confirm' => t("simple_apm.data.confirm_delete_week") %>
+        <%= link_to t("simple_apm.data.keep_one_month"), data_delete_path(type: 'month'), class: 'btn btn-danger', 'data-confirm' => t("simple_apm.data.confirm_delete_month") %>
       </div>
     </div>
   </div>
@@ -38,8 +38,8 @@
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
-      <h2 class="apm-panel-title">历史数据</h2>
-      <p class="apm-panel-subtitle">以日期为单位查看采集量和平均响应时间。</p>
+      <h2 class="apm-panel-title"><%= t("simple_apm.data.history_title") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.data.history_subtitle") %></p>
     </div>
   </div>
   <div class="apm-panel-body">
@@ -47,10 +47,10 @@
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th>日期</th>
-          <th>请求数量</th>
-          <th>平均响应时间</th>
-          <th>操作</th>
+          <th><%= t("simple_apm.data.date") %></th>
+          <th><%= t("simple_apm.data.request_count") %></th>
+          <th><%= t("simple_apm.data.avg_response_time") %></th>
+          <th><%= t("simple_apm.data.operation") %></th>
         </tr>
         </thead>
         <tbody>
@@ -60,7 +60,7 @@
             <td><%= d[:day] %></td>
             <td><%= d[:hits] %></td>
             <td><%= sec_str d[:avg_time] %></td>
-            <td><%= link_to '删除', data_delete_path(date: d[:day]), class: 'apm-danger-link', 'data-confirm' => '确定删除？' %></td>
+            <td><%= link_to t("simple_apm.data.delete"), data_delete_path(date: d[:day]), class: 'apm-danger-link', 'data-confirm' => t("simple_apm.data.confirm_delete") %></td>
           </tr>
         <% end %>
         </tbody>

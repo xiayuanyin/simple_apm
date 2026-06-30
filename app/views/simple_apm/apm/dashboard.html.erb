@@ -1,41 +1,41 @@
 <div class="apm-page-header">
   <div>
-    <h1 class="apm-page-title">性能概览</h1>
-    <p class="apm-page-subtitle">按 10 分钟粒度观察响应时间和访问量趋势。</p>
+    <h1 class="apm-page-title"><%= t("simple_apm.dashboard.title") %></h1>
+    <p class="apm-page-subtitle"><%= t("simple_apm.dashboard.subtitle") %></p>
   </div>
 </div>
 
 <div class="apm-metrics">
   <div class="apm-stat">
-    <p class="apm-stat-label">统计点</p>
+    <p class="apm-stat-label"><%= t("simple_apm.dashboard.stat_points") %></p>
     <div class="apm-stat-value"><%= @x_names.length %></div>
-    <div class="apm-stat-meta">10 分钟区间</div>
+    <div class="apm-stat-meta"><%= t("simple_apm.dashboard.ten_minute_intervals") %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">访问次数</p>
+    <p class="apm-stat-label"><%= t("simple_apm.dashboard.hits") %></p>
     <div class="apm-stat-value"><%= @hits_arr.map(&:to_i).sum %></div>
-    <div class="apm-stat-meta">当前日期累计</div>
+    <div class="apm-stat-meta"><%= t("simple_apm.dashboard.current_day_total") %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">最高平均响应</p>
+    <p class="apm-stat-label"><%= t("simple_apm.dashboard.peak_avg_response") %></p>
     <div class="apm-stat-value"><%= sec_str(@time_arr.map(&:to_f).max.to_f) %></div>
-    <div class="apm-stat-meta">区间峰值</div>
+    <div class="apm-stat-meta"><%= t("simple_apm.dashboard.interval_peak") %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">当前采集</p>
+    <p class="apm-stat-label"><%= t("simple_apm.dashboard.current_collection") %></p>
     <div class="apm-stat-value">
       <% if SimpleApm::Redis.running? %>
-        <span class="apm-status apm-status-ok">运行中</span>
+        <span class="apm-status apm-status-ok"><%= t("simple_apm.common.running") %></span>
       <% else %>
-        <span class="apm-status apm-status-danger">已暂停</span>
+        <span class="apm-status apm-status-danger"><%= t("simple_apm.common.paused") %></span>
       <% end %>
     </div>
-    <div class="apm-stat-meta">Redis 状态</div>
+    <div class="apm-stat-meta"><%= t("simple_apm.dashboard.redis_status") %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">查询日期</p>
+    <p class="apm-stat-label"><%= t("simple_apm.dashboard.query_date") %></p>
     <div class="apm-stat-value"><%= SimpleApm::RedisKey.query_date || Time.now.strftime('%Y-%m-%d') %></div>
-    <div class="apm-stat-meta">可在右上角切换</div>
+    <div class="apm-stat-meta"><%= t("simple_apm.dashboard.switch_in_top_right") %></div>
   </div>
 </div>
 
@@ -43,8 +43,8 @@
   <section class="apm-panel apm-col-6">
     <div class="apm-panel-header">
       <div>
-        <h2 class="apm-panel-title">响应时间</h2>
-        <p class="apm-panel-subtitle">每个时间段的平均响应耗时。</p>
+        <h2 class="apm-panel-title"><%= t("simple_apm.dashboard.response_time") %></h2>
+        <p class="apm-panel-subtitle"><%= t("simple_apm.dashboard.response_time_subtitle") %></p>
       </div>
     </div>
     <div class="apm-panel-body">
@@ -55,8 +55,8 @@
   <section class="apm-panel apm-col-6">
     <div class="apm-panel-header">
       <div>
-        <h2 class="apm-panel-title">访问次数</h2>
-        <p class="apm-panel-subtitle">每个时间段的请求数量。</p>
+        <h2 class="apm-panel-title"><%= t("simple_apm.dashboard.hit_count") %></h2>
+        <p class="apm-panel-subtitle"><%= t("simple_apm.dashboard.hit_count_subtitle") %></p>
       </div>
     </div>
     <div class="apm-panel-body">

@@ -1,51 +1,51 @@
 <div class="apm-page-header">
   <div>
-    <h1 class="apm-page-title">Action 概况</h1>
+    <h1 class="apm-page-title"><%= t("simple_apm.action_info.title") %></h1>
     <p class="apm-page-subtitle"><%= @action.name %></p>
   </div>
 </div>
 
 <div class="apm-metrics">
   <div class="apm-stat">
-    <p class="apm-stat-label">当日点击次数</p>
+    <p class="apm-stat-label"><%= t("simple_apm.action_info.daily_hits") %></p>
     <div class="apm-stat-value"><%= @action.click_count %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">平均响应时间</p>
+    <p class="apm-stat-label"><%= t("simple_apm.action_info.avg_response_time") %></p>
     <div class="apm-stat-value"><%= sec_str @action.time.to_f/@action.click_count.to_i %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">平均DB时间</p>
+    <p class="apm-stat-label"><%= t("simple_apm.action_info.avg_db_time") %></p>
     <div class="apm-stat-value"><%= sec_str @action.avg_db_time %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">平均SQL次数</p>
+    <p class="apm-stat-label"><%= t("simple_apm.action_info.avg_sql_count") %></p>
     <div class="apm-stat-value"><%= @action.avg_queries_count.round(1) %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">最慢响应时间</p>
+    <p class="apm-stat-label"><%= t("simple_apm.action_info.slowest_response_time") %></p>
     <div class="apm-stat-value"><%= link_to sec_str(@action.slow_time), show_path(id: @action.slow_id) %></div>
-    <div class="apm-stat-meta">最快 <%= link_to sec_str(@action.fast_time), show_path(id: @action.fast_id) %></div>
+    <div class="apm-stat-meta"><%= t("simple_apm.action_info.fastest") %> <%= link_to sec_str(@action.fast_time), show_path(id: @action.fast_id) %></div>
   </div>
 </div>
 
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
-      <h2 class="apm-panel-title">慢请求样本</h2>
-      <p class="apm-panel-subtitle">保留该 Action 下响应最慢的请求。</p>
+      <h2 class="apm-panel-title"><%= t("simple_apm.action_info.slow_samples_title") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.action_info.slow_samples_subtitle") %></p>
     </div>
   </div>
   <div class="apm-panel-body">
     <div class="apm-table-wrap">
       <table class="table table-bordered">
         <tr>
-          <th>响应时间</th>
-          <th>访问时间</th>
-          <th>内存波动</th>
-          <th>请求id</th>
-          <th>访问ip</th>
-          <th>server</th>
+          <th><%= t("simple_apm.action_info.response_time") %></th>
+          <th><%= t("simple_apm.action_info.access_time") %></th>
+          <th><%= t("simple_apm.action_info.memory_delta") %></th>
+          <th><%= t("simple_apm.action_info.request_id") %></th>
+          <th><%= t("simple_apm.action_info.ip") %></th>
+          <th><%= t("simple_apm.common.server") %></th>
         </tr>
         <% @action.slow_requests.each do |slow_request| %>
           <%
@@ -57,7 +57,7 @@
               <%= sec_str r.during %>
               (DB: <%= sec_str r.db_runtime %> ,
               SQL: <%= r.queries_count.to_i %> ,
-              View: <%= sec_str r.view_runtime %>
+              <%= t("simple_apm.common.view") %>: <%= sec_str r.view_runtime %>
               <%= "HTTP: #{sec_str r.net_http_during}" if r.net_http_during.to_f > 0 %>)
             </td>
             <td><%= time_label r.started %></td>

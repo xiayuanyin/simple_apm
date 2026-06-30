@@ -1,73 +1,81 @@
 # SimpleApm (Rails Engine)
-基于Redis的简单的Web请求性能监控/慢事务追踪工具
 
-以天为维度记录：
-- 最慢的500个(默认500)请求
-- 记录每个action最慢的20次请求
-- 记录每个action的平均访问时间
-- 记录慢请求的详情和对应SQL详情（多余的会删掉）
-- 以10分钟为刻度记录平均/最慢访问时间、次数等性能指标，并生成图表
-- 记录请求中外部http访问时间
+A lightweight Redis-backed Rails engine for web request performance monitoring and slow request tracing.
 
+SimpleApm records request performance by day:
 
-## 原理
+- The slowest requests, 500 by default.
+- The slowest 20 requests for each action.
+- Average response time for each action.
+- Slow request details and related SQL details, trimming excess records.
+- Average and slowest response time, request count, and other metrics in 10-minute intervals, with charts.
+- External HTTP request duration during each request.
 
-围绕Rack记录请求级别的相关信息，使用redis作为数据存储/计算工具来记录慢事务
+The web UI supports English and Chinese. English is used by default, and users can switch languages from the top-right corner.
 
-数据传递核心为：[Active Support Instrumentation](https://guides.rubyonrails.org/active_support_instrumentation.html)
+## How It Works
 
-处理Instrument方式为开启一个不影响主线程的常驻线程，循环计算处理数据
+SimpleApm records request-level data around Rack and uses Redis for storage and aggregation.
 
-获取内存信息用到了gem: [get_process_mem](https://github.com/schneems/get_process_mem)，经测试在linux系统耗时在1ms以下
+The core data flow is based on [Active Support Instrumentation](https://guides.rubyonrails.org/active_support_instrumentation.html).
 
+Instrumentation events are processed by a long-running worker thread so request handling does not block on metric aggregation.
 
-## 功能截图
+Memory usage is collected with [get_process_mem](https://github.com/schneems/get_process_mem). In Linux testing, collection takes less than 1 ms.
+
+## Screenshots
+
 - Dashboard
-![Dashboard](public/dashboard.jpg)
+![Dashboard](public/dashbord.png)
 
-- 慢请求列表
+- Slow Requests
 ![Slow Requests](public/slow_requests.png)
 
-- Action列表
+- Action List
 ![Action List](public/action_list.png)
 
-- 请求详情
+- Request Info
 ![Request Info](public/request_info.png)
 
-- Action概况
-![Action Info](public/action_info.png)
+- Action Info
+![Action Info](public/action_detail.png)
 
-- 数据管理
-![Data](public/data-manage.png)
-
+- Data Management
+![Data Management](public/data-manage.png)
 
 ## Usage
+
+Mount the engine in your Rails routes:
 
 ```ruby
 # routes.rb
 mount SimpleApm::Engine => "/apm"
-
-# 或运行 
-rails generate simple_apm:install 
-
 ```
 
+Or run the installer:
+
+```bash
+rails generate simple_apm:install
+```
 
 ## Installation
+
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'simple_apm'
+gem "simple_apm"
 ```
 
-And then execute:
+Then run:
+
 ```bash
-$ bundle
+bundle
 ```
-
 
 ## Contributing
-Contribution directions go here.
+
+Issues and pull requests are welcome.
 
 ## License
+
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

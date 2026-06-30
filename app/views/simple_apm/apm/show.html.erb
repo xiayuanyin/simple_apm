@@ -1,30 +1,30 @@
 <div class="apm-page-header">
   <div>
-    <h1 class="apm-page-title">请求详情</h1>
+    <h1 class="apm-page-title"><%= t("simple_apm.show.title") %></h1>
     <p class="apm-page-subtitle"><%= @request.action_name %>.<%= @request.format %>(<%= @request.method %>)</p>
   </div>
 </div>
 
 <div class="apm-metrics">
   <div class="apm-stat">
-    <p class="apm-stat-label">Total</p>
+    <p class="apm-stat-label"><%= t("simple_apm.common.total") %></p>
     <div class="apm-stat-value"><%= sec_str @request.during %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">DB</p>
+    <p class="apm-stat-label"><%= t("simple_apm.common.db") %></p>
     <div class="apm-stat-value"><%= sec_str @request.db_runtime %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">SQL</p>
+    <p class="apm-stat-label"><%= t("simple_apm.common.sql") %></p>
     <div class="apm-stat-value"><%= @request.queries_count.to_i %></div>
-    <div class="apm-stat-meta">缓存 <%= @request.cached_queries_count.to_i %></div>
+    <div class="apm-stat-meta"><%= t("simple_apm.show.cached") %> <%= @request.cached_queries_count.to_i %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">View</p>
+    <p class="apm-stat-label"><%= t("simple_apm.common.view") %></p>
     <div class="apm-stat-value"><%= sec_str @request.view_runtime %></div>
   </div>
   <div class="apm-stat">
-    <p class="apm-stat-label">HTTP</p>
+    <p class="apm-stat-label"><%= t("simple_apm.common.http") %></p>
     <div class="apm-stat-value"><%= sec_str @request.net_http_during %></div>
   </div>
 </div>
@@ -32,21 +32,21 @@
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
-      <h2 class="apm-panel-title">基础信息</h2>
-      <p class="apm-panel-subtitle">请求来源、时间和内存变化。</p>
+      <h2 class="apm-panel-title"><%= t("simple_apm.show.basic_info") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.show.basic_info_subtitle") %></p>
     </div>
   </div>
   <div class="apm-panel-body">
     <dl class="apm-detail-list">
-      <dt>URL</dt>
+      <dt><%= t("simple_apm.common.url") %></dt>
       <dd><%= @request.url %></dd>
-      <dt>开始时间</dt>
+      <dt><%= t("simple_apm.show.started_at") %></dt>
       <dd><%= time_label @request.started, true %></dd>
-      <dt>结束时内存</dt>
-      <dd><%= @request.completed_memory.to_f.round(1) %>M （增幅：<%= @request.memory_during.to_f.round(1) %>M）</dd>
-      <dt>server</dt>
+      <dt><%= t("simple_apm.show.completed_memory") %></dt>
+      <dd><%= @request.completed_memory.to_f.round(1) %>M (<%= t("simple_apm.show.memory_increase") %>: <%= @request.memory_during.to_f.round(1) %>M)</dd>
+      <dt><%= t("simple_apm.common.server") %></dt>
       <dd><%= @request.host %></dd>
-      <dt>访问ip</dt>
+      <dt><%= t("simple_apm.show.ip") %></dt>
       <dd><%= @request.remote_addr %></dd>
     </dl>
   </div>
@@ -56,7 +56,7 @@
   <section class="apm-panel">
     <div class="apm-panel-header">
       <div>
-        <h2 class="apm-panel-title">报错信息</h2>
+        <h2 class="apm-panel-title"><%= t("simple_apm.show.exception") %></h2>
       </div>
     </div>
     <div class="apm-panel-body">
@@ -69,18 +69,18 @@
   <section class="apm-panel">
     <div class="apm-panel-header">
       <div>
-        <h2 class="apm-panel-title">外部请求</h2>
-        <p class="apm-panel-subtitle">请求过程中触发的 Net::HTTP 调用。</p>
+        <h2 class="apm-panel-title"><%= t("simple_apm.show.external_requests") %></h2>
+        <p class="apm-panel-subtitle"><%= t("simple_apm.show.external_requests_subtitle") %></p>
       </div>
     </div>
     <div class="apm-panel-body">
       <div class="apm-table-wrap">
         <table class="table table-bordered">
           <tr>
-            <th>开始时间</th>
-            <th>耗时</th>
-            <th>URL</th>
-            <th>其他信息</th>
+            <th><%= t("simple_apm.show.started_at") %></th>
+            <th><%= t("simple_apm.show.duration") %></th>
+            <th><%= t("simple_apm.common.url") %></th>
+            <th><%= t("simple_apm.show.other_info") %></th>
           </tr>
           <% @request.net_http_requests.each do |r| %>
             <tr>
@@ -100,8 +100,8 @@
   <section class="apm-panel">
     <div class="apm-panel-header">
       <div>
-        <h2 class="apm-panel-title">SQL 列表</h2>
-        <p class="apm-panel-subtitle">点击 SQL 文本查看完整语句。</p>
+        <h2 class="apm-panel-title"><%= t("simple_apm.show.sql_list") %></h2>
+        <p class="apm-panel-subtitle"><%= t("simple_apm.show.sql_list_subtitle") %></p>
       </div>
     </div>
     <div class="apm-panel-body">
@@ -112,8 +112,8 @@
             <td>time</td>
             <td>name</td>
             <td>sql</td>
-            <td>时间(ms)</td>
-            <td>位置</td>
+            <td><%= t("simple_apm.show.time_ms") %></td>
+            <td><%= t("simple_apm.show.location") %></td>
           </tr>
           </thead>
           <tbody>

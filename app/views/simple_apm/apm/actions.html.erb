@@ -1,15 +1,15 @@
 <div class="apm-page-header">
   <div>
-    <h1 class="apm-page-title">Action 性能</h1>
-    <p class="apm-page-subtitle">按 Controller#Action 聚合访问次数、响应时间和 SQL 行为。</p>
+    <h1 class="apm-page-title"><%= t("simple_apm.actions.title") %></h1>
+    <p class="apm-page-subtitle"><%= t("simple_apm.actions.subtitle") %></p>
   </div>
 </div>
 
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
-      <h2 class="apm-panel-title">Action 列表</h2>
-      <p class="apm-panel-subtitle">点击 Action 名称查看该接口的慢请求样本。</p>
+      <h2 class="apm-panel-title"><%= t("simple_apm.actions.list_title") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.actions.list_subtitle") %></p>
     </div>
   </div>
   <div class="apm-panel-body">
@@ -17,14 +17,14 @@
       <table id="actions-table" class="table">
         <thead>
         <tr>
-          <th>Name</th>
-          <th>点击次数</th>
-          <th>平均响应时间</th>
-          <th>平均DB时间</th>
-          <th>平均SQL次数</th>
-          <th>平均http访问时间</th>
-          <th>最快响应时间</th>
-          <th>最慢响应时间</th>
+          <th><%= t("simple_apm.actions.name") %></th>
+          <th><%= t("simple_apm.actions.click_count") %></th>
+          <th><%= t("simple_apm.actions.avg_response_time") %></th>
+          <th><%= t("simple_apm.actions.avg_db_time") %></th>
+          <th><%= t("simple_apm.actions.avg_sql_count") %></th>
+          <th><%= t("simple_apm.actions.avg_http_time") %></th>
+          <th><%= t("simple_apm.actions.fastest_response_time") %></th>
+          <th><%= t("simple_apm.actions.slowest_response_time") %></th>
         </tr>
         </thead>
         <tbody>

@@ -1,15 +1,15 @@
 <div class="apm-page-header">
   <div>
-    <h1 class="apm-page-title">慢事务列表</h1>
-    <p class="apm-page-subtitle">按响应耗时排序，快速定位 DB、SQL、View 和外部请求占比。</p>
+    <h1 class="apm-page-title"><%= t("simple_apm.index.title") %></h1>
+    <p class="apm-page-subtitle"><%= t("simple_apm.index.subtitle") %></p>
   </div>
 </div>
 
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
-      <h2 class="apm-panel-title">请求样本</h2>
-      <p class="apm-panel-subtitle">默认加载最近的慢请求记录。</p>
+      <h2 class="apm-panel-title"><%= t("simple_apm.index.samples_title") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.index.samples_subtitle") %></p>
     </div>
   </div>
   <div class="apm-panel-body">
@@ -17,16 +17,16 @@
       <table id="slow-requests" class="table">
         <thead>
         <tr>
-          <th>请求时间</th>
-          <th>ActionName</th>
-          <th>TotalTime</th>
-          <th>DB</th>
-          <th>SQL</th>
-          <th>View</th>
-          <th>HTTP</th>
-          <th>Memory(Mb)</th>
-          <th>server</th>
-          <th>ip</th>
+          <th><%= t("simple_apm.index.request_time") %></th>
+          <th><%= t("simple_apm.index.action_name") %></th>
+          <th><%= t("simple_apm.index.total_time") %></th>
+          <th><%= t("simple_apm.common.db") %></th>
+          <th><%= t("simple_apm.common.sql") %></th>
+          <th><%= t("simple_apm.common.view") %></th>
+          <th><%= t("simple_apm.common.http") %></th>
+          <th><%= t("simple_apm.index.memory_mb") %></th>
+          <th><%= t("simple_apm.common.server") %></th>
+          <th><%= t("simple_apm.index.ip") %></th>
         </tr>
         </thead>
       </table>
