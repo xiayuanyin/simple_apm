@@ -1,0 +1,18 @@
+<section class="apm-panel">
+  <div class="apm-panel-header">
+    <div>
+      <h2 class="apm-panel-title"><%= t('simple_apm.show.timing_title') %></h2>
+      <p class="apm-panel-subtitle"><%= t('simple_apm.show.timing_hint') %></p>
+    </div>
+  </div>
+  <div class="apm-panel-body">
+    <% parts.each do |label, duration| %>
+      <% percentage = duration_percent(duration, total) %>
+      <div class="apm-runtime-row">
+        <span><%= label %></span>
+        <meter min="0" max="100" value="<%= percentage %>" aria-label="<%= label %>"><%= percentage %>%</meter>
+        <span><%= sec_str duration %> · <%= percentage %>%</span>
+      </div>
+    <% end %>
+  </div>
+</section>

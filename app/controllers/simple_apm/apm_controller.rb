@@ -8,27 +8,32 @@ module SimpleApm
     def dashboard
       d = SimpleApm::RedisKey.query_date == Time.now.strftime('%Y-%m-%d') ? Time.now.strftime('%H:%M') : '23:50'
       data = SimpleApm::Hit.chart_data(0, d)
+      hits = data.values.sum { |point| point[:hits].to_i }
+      time = data.values.sum { |point| point[:time].to_f }
+      @daily_stats = {hits: hits, time: time, avg_time: hits.zero? ? 0 : time / hits}
       @x_names = data.keys.sort
       @time_arr = @x_names.map {|n| data[n][:hits].to_i.zero? ? 0 : (data[n][:time].to_f / data[n][:hits].to_i).round(3)}
       @hits_arr = @x_names.map {|n| data[n][:hits] rescue 0}
     end
 
     def index
+      @sample_limit = [[(params[:count].presence || 200).to_i, 1].max, SimpleApm::Setting::SLOW_ACTIONS_LIMIT.to_i].min
       respond_to do |format|
         format.json do
-          @slow_requests = SimpleApm::SlowRequest.list(params[:count] || 200).map do |r|
-            request = r.request rescue next
+          @slow_requests = SimpleApm::SlowRequest.list(@sample_limit).map do |r|
+            request = r.request
+            next unless request
             [
-              link_to(time_label(request.started), show_path(id: request.request_id)),
-              link_to(request.action_name, action_info_path(action_name: request.action_name)),
-              sec_str(request.during),
-              sec_str(request.db_runtime),
+              link_to(time_label(request.started), show_path(id: request.request_id, apm_date: apm_date)),
+              link_to(request.action_name, action_info_path(action_name: request.action_name, apm_date: apm_date)),
+              duration_cell(request.during),
+              duration_cell(request.db_runtime),
               request.queries_count,
-              sec_str(request.view_runtime),
-              sec_str(request.net_http_during),
+              duration_cell(request.view_runtime),
+              duration_cell(request.net_http_during),
               request.memory_during.to_f.round(1),
-              request.host,
-              request.remote_addr
+              ERB::Util.html_escape(request.host),
+              ERB::Util.html_escape(request.remote_addr)
             ]
           end.compact
           render json: {data: @slow_requests}
@@ -39,6 +44,7 @@ module SimpleApm
 
     def show
       @request = SimpleApm::Request.find(params[:id])
+      render :missing, status: :not_found unless @request
     end
 
     def actions
@@ -47,6 +53,7 @@ module SimpleApm
 
     def action_info
       @action = SimpleApm::Action.find(params[:action_name])
+      render :missing, status: :not_found if @action.click_count.to_i.zero?
     end
 
     def change_date
@@ -102,7 +109,11 @@ module SimpleApm
     end
 
     def link_to(name, url)
-      "<a href=#{url.to_json}>#{name}</a>"
+      helpers.link_to(name, url)
+    end
+
+    def duration_cell(seconds)
+      helpers.content_tag(:span, sec_str(seconds), data: {seconds: seconds.to_f})
     end
   end
 end

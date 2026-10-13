@@ -1,0 +1,17 @@
+<section class="apm-panel apm-export">
+  <div class="apm-panel-header">
+    <div>
+      <h2 class="apm-panel-title"><%= t("simple_apm.diagnostics.title") %></h2>
+      <p class="apm-panel-subtitle"><%= t("simple_apm.diagnostics.hint") %></p>
+    </div>
+    <button type="button" class="btn btn-primary" data-copy-target="diagnostic-report"><%= t("simple_apm.diagnostics.copy") %></button>
+  </div>
+  <div class="apm-panel-body">
+    <details>
+      <summary><%= t("simple_apm.diagnostics.preview") %></summary>
+      <label class="sr-only" for="diagnostic-report"><%= t("simple_apm.diagnostics.title") %></label>
+      <textarea id="diagnostic-report" class="apm-report-text apm-mono" readonly rows="14" spellcheck="false"><%= JSON.pretty_generate(report) %></textarea>
+    </details>
+    <p class="apm-copy-status" role="status" aria-live="polite"></p>
+  </div>
+</section>

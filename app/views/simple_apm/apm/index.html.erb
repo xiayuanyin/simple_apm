@@ -11,22 +11,30 @@
       <h2 class="apm-panel-title"><%= t("simple_apm.index.samples_title") %></h2>
       <p class="apm-panel-subtitle"><%= t("simple_apm.index.samples_subtitle") %></p>
     </div>
+    <div class="apm-toolbar-actions">
+      <%= label_tag 'sample-limit', t("simple_apm.index.sample_limit") %>
+      <% maximum_samples = [SimpleApm::Setting::SLOW_ACTIONS_LIMIT.to_i, 1].max %>
+      <% sample_limits = ([50, 200, 500].map { |limit| [limit, maximum_samples].min } + [@sample_limit]).uniq.sort %>
+      <%= select_tag 'sample-limit', options_for_select(sample_limits, @sample_limit), class: 'form-control' %>
+      <button id="refresh-requests" type="button" class="btn apm-button-secondary"><%= t("simple_apm.index.refresh") %></button>
+    </div>
   </div>
   <div class="apm-panel-body">
+    <p id="slow-requests-feedback" class="apm-table-feedback" role="status" aria-live="polite"></p>
     <div class="apm-table-wrap">
-      <table id="slow-requests" class="table">
+      <table id="slow-requests" class="table" aria-describedby="slow-requests-feedback">
         <thead>
         <tr>
-          <th><%= t("simple_apm.index.request_time") %></th>
-          <th><%= t("simple_apm.index.action_name") %></th>
-          <th><%= t("simple_apm.index.total_time") %></th>
-          <th><%= t("simple_apm.common.db") %></th>
-          <th><%= t("simple_apm.common.sql") %></th>
-          <th><%= t("simple_apm.common.view") %></th>
-          <th><%= t("simple_apm.common.http") %></th>
-          <th><%= t("simple_apm.index.memory_mb") %></th>
-          <th><%= t("simple_apm.common.server") %></th>
-          <th><%= t("simple_apm.index.ip") %></th>
+          <th scope="col"><%= t("simple_apm.index.request_time") %></th>
+          <th scope="col"><%= t("simple_apm.index.action_name") %></th>
+          <th scope="col"><%= t("simple_apm.index.total_time") %></th>
+          <th scope="col"><%= t("simple_apm.common.db") %></th>
+          <th scope="col"><%= t("simple_apm.common.sql") %></th>
+          <th scope="col"><%= t("simple_apm.common.view") %></th>
+          <th scope="col"><%= t("simple_apm.common.http") %></th>
+          <th scope="col"><%= t("simple_apm.index.memory_mb") %></th>
+          <th scope="col"><%= t("simple_apm.common.server") %></th>
+          <th scope="col"><%= t("simple_apm.index.ip") %></th>
         </tr>
         </thead>
       </table>
@@ -36,11 +44,31 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $('#slow-requests').DataTable({
-      ajax: '<%= index_path %>.json',
-      iDisplayLength: 25,
-      ordering: false
-    })
-
+    var requestsUrl = <%= raw json_escape(index_path(format: :json, apm_date: apm_date).to_json) %>,
+        refreshButton = $('#refresh-requests'),
+        sampleLimit = $('#sample-limit');
+    var requestsTable = $('#slow-requests').on('processing.dt', function (event, settings, processing) {
+      refreshButton.prop('disabled', processing).text(processing ? '<%= j t("simple_apm.index.refresh_loading") %>' : '<%= j t("simple_apm.index.refresh") %>');
+      sampleLimit.prop('disabled', processing);
+      $(this).attr('aria-busy', processing ? 'true' : 'false');
+    }).DataTable(window.SimpleApmUI.tableOptions({
+      ajax: requestsUrl + '&count=' + encodeURIComponent(sampleLimit.val()),
+      order: [[2, 'desc']],
+      columnDefs: [
+        {type: 'sec', targets: [2, 3, 5, 6]},
+        {type: 'num', targets: [4, 7]},
+        {className: 'apm-mono', targets: [1, 8, 9]}
+      ]
+    }));
+    refreshButton.on('click', function () {
+      requestsTable.ajax.reload(null, false);
+    });
+    sampleLimit.on('change', function () {
+      var pageUrl = new URL(window.location.href);
+      pageUrl.searchParams.set('count', this.value);
+      window.history.replaceState(null, '', pageUrl.toString());
+      $('.apm-date-form input[name="count"]').val(this.value);
+      requestsTable.ajax.url(requestsUrl + '&count=' + encodeURIComponent(this.value)).load();
+    });
   })
 </script>

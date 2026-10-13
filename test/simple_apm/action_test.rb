@@ -43,6 +43,18 @@ module SimpleApm
       assert_in_delta 4.0, action.avg_queries_count
     end
 
+    test "averages stay finite for actions without recorded requests" do
+      [nil, 0, "0"].each do |count|
+        action = SimpleApm::Action.new(click_count: count, time: 1.0, db_time: 0.2,
+          http_time: 0.1, queries_count: 3, cached_queries_count: 2)
+
+        [:avg_time, :avg_db_time, :avg_http_time, :avg_queries_count, :avg_cached_queries_count].each do |metric|
+          assert_equal 0.0, action.public_send(metric)
+          assert action.public_send(metric).finite?
+        end
+      end
+    end
+
     private
 
     def with_singleton_method(klass, method_name, replacement)

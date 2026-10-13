@@ -1,33 +1,41 @@
+<nav class="apm-breadcrumb" aria-label="<%= t('simple_apm.action_info.title') %>">
+  <%= link_to t('simple_apm.common.back_actions'), actions_path(apm_date: apm_date) %>
+</nav>
 <div class="apm-page-header">
   <div>
     <h1 class="apm-page-title"><%= t("simple_apm.action_info.title") %></h1>
-    <p class="apm-page-subtitle"><%= @action.name %></p>
+    <p class="apm-page-subtitle apm-mono"><%= @action.name %> · <%= apm_date %></p>
   </div>
 </div>
 
 <div class="apm-metrics">
   <div class="apm-stat">
     <p class="apm-stat-label"><%= t("simple_apm.action_info.daily_hits") %></p>
-    <div class="apm-stat-value"><%= @action.click_count %></div>
+    <div class="apm-stat-value"><%= number_with_delimiter @action.click_count.to_i %></div>
   </div>
   <div class="apm-stat">
     <p class="apm-stat-label"><%= t("simple_apm.action_info.avg_response_time") %></p>
-    <div class="apm-stat-value"><%= sec_str @action.time.to_f/@action.click_count.to_i %></div>
+    <div class="apm-stat-value"><%= sec_str @action.avg_time %></div>
   </div>
   <div class="apm-stat">
     <p class="apm-stat-label"><%= t("simple_apm.action_info.avg_db_time") %></p>
     <div class="apm-stat-value"><%= sec_str @action.avg_db_time %></div>
+    <div class="apm-stat-meta"><%= t('simple_apm.action_info.avg_http_time') %>: <%= sec_str @action.avg_http_time %></div>
   </div>
   <div class="apm-stat">
     <p class="apm-stat-label"><%= t("simple_apm.action_info.avg_sql_count") %></p>
     <div class="apm-stat-value"><%= @action.avg_queries_count.round(1) %></div>
+    <div class="apm-stat-meta"><%= t('simple_apm.action_info.cached_queries') %>: <%= @action.avg_cached_queries_count.round(1) %></div>
   </div>
   <div class="apm-stat">
     <p class="apm-stat-label"><%= t("simple_apm.action_info.slowest_response_time") %></p>
-    <div class="apm-stat-value"><%= link_to sec_str(@action.slow_time), show_path(id: @action.slow_id) %></div>
-    <div class="apm-stat-meta"><%= t("simple_apm.action_info.fastest") %> <%= link_to sec_str(@action.fast_time), show_path(id: @action.fast_id) %></div>
+    <div class="apm-stat-value"><%= link_to sec_str(@action.slow_time), show_path(id: @action.slow_id, apm_date: apm_date) %></div>
+    <div class="apm-stat-meta"><%= t("simple_apm.action_info.fastest") %> <%= link_to sec_str(@action.fast_time), show_path(id: @action.fast_id, apm_date: apm_date) %></div>
   </div>
 </div>
+
+<%= render 'diagnostic_export', report: SimpleApm::DiagnosticReport.for_action(@action, date: apm_date) %>
+<%= render 'timings', total: @action.avg_time, parts: [[t('simple_apm.common.db'), @action.avg_db_time], [t('simple_apm.common.http'), @action.avg_http_time]] %>
 
 <section class="apm-panel">
   <div class="apm-panel-header">
@@ -38,36 +46,49 @@
   </div>
   <div class="apm-panel-body">
     <div class="apm-table-wrap">
-      <table class="table table-bordered">
+      <table id="action-samples" class="table">
+        <thead>
         <tr>
           <th><%= t("simple_apm.action_info.response_time") %></th>
+          <th><%= t('simple_apm.common.db') %></th>
+          <th><%= t('simple_apm.common.sql') %></th>
+          <th><%= t('simple_apm.common.view') %></th>
+          <th><%= t('simple_apm.common.http') %></th>
           <th><%= t("simple_apm.action_info.access_time") %></th>
           <th><%= t("simple_apm.action_info.memory_delta") %></th>
           <th><%= t("simple_apm.action_info.request_id") %></th>
+          <th><%= t('simple_apm.common.status') %></th>
           <th><%= t("simple_apm.action_info.ip") %></th>
           <th><%= t("simple_apm.common.server") %></th>
         </tr>
+        </thead>
+        <tbody>
         <% @action.slow_requests.each do |slow_request| %>
           <%
             r = slow_request.request
             next if r.blank?
           %>
           <tr>
-            <td>
-              <%= sec_str r.during %>
-              (DB: <%= sec_str r.db_runtime %> ,
-              SQL: <%= r.queries_count.to_i %> ,
-              <%= t("simple_apm.common.view") %>: <%= sec_str r.view_runtime %>
-              <%= "HTTP: #{sec_str r.net_http_during}" if r.net_http_during.to_f > 0 %>)
-            </td>
+            <td data-order="<%= r.during.to_f %>"><%= link_to sec_str(r.during), show_path(id: r.request_id, apm_date: apm_date) %></td>
+            <td data-order="<%= r.db_runtime.to_f %>"><%= sec_str r.db_runtime %></td>
+            <td><%= r.queries_count.to_i %></td>
+            <td data-order="<%= r.view_runtime.to_f %>"><%= sec_str r.view_runtime %></td>
+            <td data-order="<%= r.net_http_during.to_f %>"><%= sec_str r.net_http_during %></td>
             <td><%= time_label r.started %></td>
-            <td><%= r.memory_during.to_f.round(1) %></td>
-            <td><%= link_to r.request_id, show_path(id: r.request_id) %></td>
+            <td data-order="<%= r.memory_during.to_f %>"><%= r.memory_during.to_f.round(1) %> MB</td>
+            <td class="apm-mono"><%= link_to r.request_id, show_path(id: r.request_id, apm_date: apm_date) %></td>
+            <td><%= r.status.presence || t('simple_apm.common.unknown') %></td>
             <td><%= r.remote_addr %></td>
             <td><%= r.host %></td>
           </tr>
         <% end %>
+        </tbody>
       </table>
     </div>
   </div>
 </section>
+<script>
+  $(function () {
+    $('#action-samples').DataTable(window.SimpleApmUI.tableOptions({order: [[0, 'desc']]}));
+  });
+</script>

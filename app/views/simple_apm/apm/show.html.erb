@@ -1,8 +1,14 @@
+<nav class="apm-breadcrumb" aria-label="<%= t('simple_apm.show.title') %>">
+  <%= link_to t('simple_apm.common.back_requests'), index_path(apm_date: apm_date) %>
+  <span aria-hidden="true">/</span>
+  <%= link_to @request.action_name, action_info_path(action_name: @request.action_name, apm_date: apm_date) %>
+</nav>
 <div class="apm-page-header">
   <div>
     <h1 class="apm-page-title"><%= t("simple_apm.show.title") %></h1>
-    <p class="apm-page-subtitle"><%= @request.action_name %>.<%= @request.format %>(<%= @request.method %>)</p>
+    <p class="apm-page-subtitle apm-mono"><%= @request.action_name %> · <%= @request.method %> · <%= @request.format %></p>
   </div>
+  <span class="apm-status <%= @request.status.to_i >= 400 ? 'apm-status-danger' : 'apm-status-neutral' %>"><%= t('simple_apm.common.status') %>: <%= @request.status.presence || t('simple_apm.common.unknown') %></span>
 </div>
 
 <div class="apm-metrics">
@@ -29,6 +35,10 @@
   </div>
 </div>
 
+<%= render 'diagnostic_export', report: SimpleApm::DiagnosticReport.for_request(@request, date: apm_date) %>
+
+<%= render 'timings', total: @request.during, parts: [[t('simple_apm.common.db'), @request.db_runtime], [t('simple_apm.common.view'), @request.view_runtime], [t('simple_apm.common.http'), @request.net_http_during]] %>
+
 <section class="apm-panel">
   <div class="apm-panel-header">
     <div>
@@ -38,12 +48,16 @@
   </div>
   <div class="apm-panel-body">
     <dl class="apm-detail-list">
+      <dt><%= t('simple_apm.show.request_id') %></dt>
+      <dd><span id="request-id" class="apm-mono"><%= @request.request_id %></span></dd>
+      <dt><%= t('simple_apm.show.format_method') %></dt>
+      <dd><%= @request.method.presence || t('simple_apm.common.unknown') %> / <%= @request.format %></dd>
       <dt><%= t("simple_apm.common.url") %></dt>
-      <dd><%= @request.url %></dd>
+      <dd class="apm-mono"><%= @request.url %></dd>
       <dt><%= t("simple_apm.show.started_at") %></dt>
       <dd><%= time_label @request.started, true %></dd>
       <dt><%= t("simple_apm.show.completed_memory") %></dt>
-      <dd><%= @request.completed_memory.to_f.round(1) %>M (<%= t("simple_apm.show.memory_increase") %>: <%= @request.memory_during.to_f.round(1) %>M)</dd>
+      <dd><%= @request.completed_memory.to_f.round(1) %> MB (<%= t("simple_apm.show.memory_increase") %>: <%= @request.memory_during.to_f.round(1) %> MB)</dd>
       <dt><%= t("simple_apm.common.server") %></dt>
       <dd><%= @request.host %></dd>
       <dt><%= t("simple_apm.show.ip") %></dt>
@@ -65,7 +79,6 @@
   </section>
 <% end %>
 
-<% if @request.net_http_requests.present? %>
   <section class="apm-panel">
     <div class="apm-panel-header">
       <div>
@@ -74,29 +87,35 @@
       </div>
     </div>
     <div class="apm-panel-body">
+      <% if @request.net_http_requests.empty? %>
+        <p class="apm-stat-hint"><%= t('simple_apm.show.no_http') %></p>
+      <% else %>
       <div class="apm-table-wrap">
         <table class="table table-bordered">
+          <thead>
           <tr>
             <th><%= t("simple_apm.show.started_at") %></th>
             <th><%= t("simple_apm.show.duration") %></th>
             <th><%= t("simple_apm.common.url") %></th>
             <th><%= t("simple_apm.show.other_info") %></th>
           </tr>
+          </thead>
+          <tbody>
           <% @request.net_http_requests.each do |r| %>
             <tr>
               <td><%= time_label r.started %></td>
               <td><%= sec_str r.during %></td>
-              <td><%= r.url %></td>
-              <td><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>
+              <td class="apm-mono"><%= r.url %></td>
+              <td class="apm-mono"><%= "#{r.filename}: #{r.line}" if r.filename.present? %></td>
             </tr>
           <% end %>
+          </tbody>
         </table>
       </div>
+      <% end %>
     </div>
   </section>
-<% end %>
 
-<% if @request.sqls.present? %>
   <section class="apm-panel">
     <div class="apm-panel-header">
       <div>
@@ -105,15 +124,19 @@
       </div>
     </div>
     <div class="apm-panel-body">
+      <% if @request.sqls.empty? %>
+        <p class="apm-stat-hint"><%= t('simple_apm.show.no_sql') %></p>
+      <% else %>
       <div class="apm-table-wrap">
         <table id="sql-table" class="table">
           <thead>
           <tr>
-            <td>time</td>
-            <td>name</td>
-            <td>sql</td>
-            <td><%= t("simple_apm.show.time_ms") %></td>
-            <td><%= t("simple_apm.show.location") %></td>
+            <th><%= t('simple_apm.show.started_at') %></th>
+            <th><%= t('simple_apm.show.sql_name') %></th>
+            <th>SQL</th>
+            <th><%= t('simple_apm.common.duration') %></th>
+            <th><%= t('simple_apm.show.sql_cached') %></th>
+            <th><%= t("simple_apm.show.location") %></th>
           </tr>
           </thead>
           <tbody>
@@ -124,24 +147,26 @@
                 <%= sql.name %>
               </td>
               <td>
-                <div class="sql"><%= sql.full_sql -%></div>
+                <button type="button" class="sql" aria-label="<%= t('simple_apm.show.sql_list_subtitle') %>"><%= sql.full_sql -%></button>
               </td>
-              <td><%= sec_str sql.during %></td>
-              <td><%= sql.filename %>:<%= sql.line %></td>
+              <td data-order="<%= sql.during.to_f %>"><%= sec_str sql.during %></td>
+              <td><%= sql.cached.nil? ? t('simple_apm.common.unknown') : t("simple_apm.show.#{sql.cached ? 'cache_hit' : 'cache_miss'}") %></td>
+              <td class="apm-mono"><%= "#{sql.filename}:#{sql.line}" if sql.filename.present? %></td>
             </tr>
           <% end %>
           </tbody>
         </table>
       </div>
+      <% end %>
     </div>
   </section>
+<% if @request.sqls.present? %>
   <script type="text/javascript">
       $(document).ready(function () {
-          $('#sql-table').DataTable({
-              bPaginate: false,
-              // 自定义的排序方法
-              aoColumnDefs: [{sType: "sec", aTargets: [3]}]
-          })
+          $('#sql-table').DataTable(window.SimpleApmUI.tableOptions({
+              paging: false,
+              order: [[3, 'desc']]
+          }))
 
       })
   </script>

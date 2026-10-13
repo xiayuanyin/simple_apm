@@ -1,0 +1,8 @@
+<section class="apm-panel apm-empty-state">
+  <h1 class="apm-page-title"><%= t("simple_apm.common.missing_title") %></h1>
+  <p class="apm-page-subtitle"><%= t("simple_apm.common.missing_hint") %></p>
+  <div class="apm-toolbar-actions">
+    <%= link_to t("simple_apm.layout.nav_slow_requests"), index_path, class: 'btn apm-button-secondary' %>
+    <%= link_to t("simple_apm.layout.nav_actions"), actions_path, class: 'btn btn-primary' %>
+  </div>
+</section>

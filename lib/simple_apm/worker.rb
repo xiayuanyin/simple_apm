@@ -51,13 +51,14 @@ module SimpleApm
                   host: Socket.gethostname,
                   remote_addr: remote_addr,
                   method: payload[:method],
+                  status: payload[:status],
                   completed_memory: completed_memory,
                   memory_during: memory_during,
                   format: payload[:format],
                   net_http_during: net_http_during,
                   exception: payload[:exception].presence.to_json
               }.with_indifferent_access
-              info[:status] = '500' if payload[:exception]
+              info[:status] ||= '500' if payload[:exception]
               # 存储
               in_slow = SimpleApm::SlowRequest.update_by_request info
               in_action_info = SimpleApm::Action.update_by_request info
@@ -92,6 +93,8 @@ module SimpleApm
                 started: started,
                 sql: payload[:sql],
                 value: sql_value,
+                cached: payload[:cached] || false,
+                method: payload[:method],
                 filename: payload[:filename],
                 line: payload[:line]
             }.with_indifferent_access

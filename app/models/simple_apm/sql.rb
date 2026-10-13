@@ -1,7 +1,7 @@
 # 请求对应的SQL查询列表
 module SimpleApm
   class Sql
-    attr_accessor :request_id, :sql, :line, :filename, :method, :name, :during, :started, :value
+    attr_accessor :request_id, :sql, :line, :filename, :method, :name, :during, :started, :value, :cached
     def initialize(h, request = nil)
       h.each do |k, v|
         send("#{k}=", v)  rescue puts "attr #{k} not set!"

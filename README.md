@@ -13,6 +13,10 @@ SimpleApm records request performance by day:
 
 The web UI supports English and Chinese. English is used by default, and users can switch languages from the top-right corner.
 
+Action and request detail pages include **Copy for AI** with a JSON preview. Request reports include metadata, timings in seconds, memory in MB, retained SQL and external HTTP calls with code locations. Action reports add daily aggregates and the retained fastest, slowest and slow request samples, marking unavailable details explicitly. Common credential fields and SQL string literals are filtered; reports describe collection thresholds and sampling limits. Clipboard copying includes a fallback for HTTP deployments and manual selection when browser copying is unavailable.
+
+Lists support search and precise duration sorting. Slow requests offer a sample limit and refresh controls, while date-aware links keep the selected day's context across pages. Data cleanup and collection controls use POST forms with confirmation for destructive operations.
+
 ## How It Works
 
 SimpleApm records request-level data around Rack and uses Redis for storage and aggregation.

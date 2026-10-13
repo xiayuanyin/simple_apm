@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= simple_apm_locale %>">
 <head>
-  <title>Simple Apm</title>
+  <title><%= t("simple_apm.#{action_name}.title", default: 'Simple APM') %> · Simple APM</title>
   <meta charset="utf-8">
   <meta content="IE=Edge,chrome=1" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -12,36 +12,18 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.js"></script>
   <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-  <script type="text/javascript">
-      // JqueryDataTable自定义排序方法
-      jQuery.extend(jQuery.fn.dataTableExt.oSort, {
-          "sec-pre": function (a) {
-              var x = String(a).replace(/<[\s\S]*?>/g, "");    //去除html标记
-              x = x.replace(/&amp;nbsp;/ig, "");                   //去除空格
-              x = x.replace(/%/, "");                          //去除百分号
-              if (x.indexOf('ms') > 0) {
-                  x = x.replace(/ms/, "");
-                  return parseFloat(x) / 1000;
-              } else if (x.indexOf('min') > 0) {
-                  x = x.replace(/min/, "");
-                  return parseFloat(x) * 60;
-              } else {
-                  x = x.replace(/min/, "");
-                  return parseFloat(x)
-              }
-          },
-          "sec-asc": function (a, b) {                //正序排序引用方法
-              return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-          },
-          "sec-desc": function (a, b) {                //倒序排序引用方法
-              return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-          }
-      });
-  </script>
+  <script type="application/json" id="apm-ui-config"><%= json_escape({
+    table: table_language,
+    copied: t('simple_apm.diagnostics.copied'),
+    copy_failed: t('simple_apm.diagnostics.copy_failed'),
+    load_error: t('simple_apm.index.load_error')
+  }.to_json).html_safe %></script>
+  <%= javascript_include_tag "simple_apm/application" %>
 
   <%= csrf_meta_tags %>
 </head>
 <body class="simple-apm">
+<a class="apm-skip-link" href="#main-content"><%= t('simple_apm.common.skip_content') %></a>
 <div id="page-container" class="apm-shell">
   <nav class="apm-topbar">
     <div class="apm-topbar-inner">
@@ -52,14 +34,14 @@
       <div class="apm-nav">
         <%
           [
-            [dashboard_path, t("simple_apm.layout.nav_dashboard")],
-            [index_path, t("simple_apm.layout.nav_slow_requests")],
-            [actions_path, t("simple_apm.layout.nav_actions")],
-            [data_path, t("simple_apm.layout.nav_data")]
+            [dashboard_path(apm_date: apm_date), t("simple_apm.layout.nav_dashboard"), %w[dashboard]],
+            [index_path(apm_date: apm_date), t("simple_apm.layout.nav_slow_requests"), %w[index show]],
+            [actions_path(apm_date: apm_date), t("simple_apm.layout.nav_actions"), %w[actions action_info]],
+            [data_path(apm_date: apm_date), t("simple_apm.layout.nav_data"), %w[data]]
           ].each do |m|
         %>
-          <a class="navbar-brand <%= 'active' if request.url =~ /#{m[0]}/ %>"
-             href="<%= m[0] %>" >
+          <a class="navbar-brand <%= 'active' if m[2].include?(action_name) %>"
+             href="<%= m[0] %>" <%= 'aria-current=page' if m[2].include?(action_name) %>>
             <%= m[1] %>
           </a>
         <% end %>
@@ -72,12 +54,22 @@
         <% end %>
       </div>
       <div class="select-apm-date apm-date-select">
-        <span><%= t("simple_apm.layout.date") %></span>
-        <%= select_tag 'apm_date', options_for_select(SimpleApm::Redis.in_apm_days, apm_date), class: 'form-control' %>
+        <% date_path = action_name == 'show' ? (@request ? action_info_path : index_path) : request.path %>
+        <%= form_tag date_path, method: :get, class: 'apm-date-form' do %>
+          <label for="apm_date"><%= t("simple_apm.layout.date") %></label>
+          <%= hidden_field_tag :action_name, @request.action_name if action_name == 'show' && @request %>
+          <%= hidden_field_tag :action_name, @action.name if action_name == 'action_info' && @action %>
+          <%= hidden_field_tag :count, @sample_limit if action_name == 'index' %>
+          <%= select_tag 'apm_date', options_for_select((SimpleApm::Redis.in_apm_days + [apm_date]).uniq.sort.reverse, apm_date), class: 'form-control' %>
+          <noscript><button type="submit" class="btn btn-primary"><%= t('simple_apm.common.apply') %></button></noscript>
+        <% end %>
       </div>
     </div>
   </nav>
-  <main class="apm-content">
+  <main id="main-content" class="apm-content" tabindex="-1">
+    <% if flash[:notice].present? %>
+      <div class="apm-notice" role="status"><%= flash[:notice] %></div>
+    <% end %>
     <%= yield %>
   </main>
 </div>
@@ -113,14 +105,19 @@
     <% end %>
   </div>
 </footer>
-<div id="sql-modal" class="modal" aria-hidden="true" role="dialog" style="display: none;" tabindex="-1">
+<div id="sql-modal" class="modal" aria-hidden="true" aria-labelledby="sql-modal-title" role="dialog" style="display: none;" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-popout">
     <div class="apm-modal-panel">
       <div class="apm-modal-header">
-        <div class="apm-modal-title">SQL</div>
+        <h2 id="sql-modal-title" class="apm-modal-title">SQL</h2>
+        <div class="apm-toolbar-actions">
+          <button type="button" class="btn btn-primary" data-copy-target="sql-modal-text"><%= t('simple_apm.common.copy') %></button>
+          <button type="button" class="btn apm-button-secondary" data-dismiss="modal"><%= t('simple_apm.common.close') %></button>
+        </div>
       </div>
       <div class="apm-modal-body">
-        <pre class="modal-content" data-lang="SQL"></pre>
+        <pre id="sql-modal-text" class="modal-content" data-lang="SQL"></pre>
+        <p class="apm-copy-status" role="status" aria-live="polite"></p>
       </div>
     </div>
 
@@ -128,22 +125,4 @@
 </div>
 
 </body>
-<script>
-    <% if flash[:notice].present? %>
-      alert(<%= flash[:notice].to_json.html_safe %>)
-    <% end %>
-    var sql_modal_obj = $('#sql-modal')
-    $('.select-apm-date select').on('change', function () {
-        window.location.href = '<%= set_apm_date_path %>?apm_date=' + this.value
-    })
-    $('.sql').on('click', function () {
-        sql_modal_obj.find('.modal-content').html($(this).html())
-        sql_modal_obj.modal('show')
-    })
-    // 手写部分ujs
-    $("a[data-confirm]").on('click', function () {
-        return confirm($(this).data('confirm'))
-    })
-
-</script>
 </html>

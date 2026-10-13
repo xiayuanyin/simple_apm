@@ -23,23 +23,23 @@ module SimpleApm
     end
 
     def avg_http_time
-      http_time.to_f/click_count.to_i
+      click_count.to_i.zero? ? 0.0 : http_time.to_f/click_count.to_i
     end
 
     def avg_db_time
-      db_time.to_f/click_count.to_i
+      click_count.to_i.zero? ? 0.0 : db_time.to_f/click_count.to_i
     end
 
     def avg_queries_count
-      queries_count.to_f/click_count.to_i
+      click_count.to_i.zero? ? 0.0 : queries_count.to_f/click_count.to_i
     end
 
     def avg_cached_queries_count
-      cached_queries_count.to_f/click_count.to_i
+      click_count.to_i.zero? ? 0.0 : cached_queries_count.to_f/click_count.to_i
     end
 
     def avg_time
-      time.to_f/click_count.to_i
+      click_count.to_i.zero? ? 0.0 : time.to_f/click_count.to_i
     end
 
     class << self
