@@ -18,6 +18,14 @@ module SimpleApm
   class Engine < ::Rails::Engine
     isolate_namespace SimpleApm
     config.app_middleware.use SimpleApm::Rack
+
+    initializer "simple_apm.available_locales" do |app|
+      unless app.config.i18n.available_locales.nil?
+        app.config.i18n.available_locales =
+          Array(app.config.i18n.available_locales).compact |
+          [:en, :"zh-CN"]
+      end
+    end
   end
 
 end
